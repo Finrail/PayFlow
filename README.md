@@ -1,318 +1,270 @@
 # PayFlow
 
-Open-source payment infrastructure for Stellar.
+**Open-source payment infrastructure for the Stellar network**
 
-## Why PayFlow Exists
+PayFlow makes it easy for businesses to accept Stellar payments without dealing with the complexity of blockchain transactions, payment monitoring, or webhooks. We handle the technical details so you can focus on your business.
 
-PayFlow makes it extremely easy for developers and businesses to accept Stellar payments without needing to understand Stellar transaction construction, monitoring, webhooks, payment states, and payment links themselves.
+---
 
-PayFlow is **NOT** a wallet. It is payment infrastructure that handles the complexity of Stellar payments so you can focus on building your product.
+## 🎯 What is PayFlow?
 
-## Features
+PayFlow is payment infrastructure - not a wallet. Think of it as Stripe for Stellar:
 
-- **Merchant Account System**: Create accounts, manage API keys, and access a dashboard
-- **Stellar Testnet Support**: Full integration with Stellar Testnet for development and testing
-- **Payment Intents**: Create and manage payment requests with idempotency support
-- **Payment Links**: Generate shareable payment links for customers
-- **Stellar Transaction Processing**: Automatic transaction creation, signing, and submission
-- **Payment Confirmation**: Real-time monitoring and verification of Stellar transactions
-- **Webhooks**: Event-driven notifications with signing, delivery, and retry logic
-- **Invoice System**: Create and manage professional invoices
-- **QR Code Generation**: Generate QR codes for payment links
-- **TypeScript SDK**: Easy-to-use SDK for integration
-- **Soroban Smart Contract**: Payment escrow/settlement mechanism on-chain
+- **For Merchants**: Accept payments from customers using Stellar
+- **For Developers**: Simple API to integrate Stellar payments
+- **For Everyone**: Built on the fast, low-cost Stellar network
 
-## Architecture
+### What PayFlow Does
 
-```mermaid
-graph TB
-    subgraph "Frontend"
-        A[Next.js Dashboard]
-        B[Payment Link Page]
-    end
-    
-    subgraph "Backend API"
-        C[Fastify Server]
-        D[Auth Service]
-        E[Payment Service]
-        F[Invoice Service]
-        G[Webhook Service]
-    end
-    
-    subgraph "Database"
-        H[PostgreSQL]
-    end
-    
-    subgraph "Blockchain"
-        I[Stellar Testnet]
-        J[Soroban Contract]
-    end
-    
-    A --> C
-    B --> C
-    C --> D
-    C --> E
-    C --> F
-    C --> G
-    D --> H
-    E --> H
-    F --> H
-    G --> H
-    E --> I
-    F --> I
-    I --> J
+✅ **Accept Payments**: Create payment links and invoices  
+✅ **Handle Transactions**: We manage Stellar blockchain interactions  
+✅ **Monitor Payments**: Automatic payment confirmation tracking  
+✅ **Send Notifications**: Webhooks when payments complete  
+✅ **Manage Customers**: Dashboard to track all your payments  
+
+### What PayFlow Does NOT Do
+
+❌ Store customer funds (payments go directly to your Stellar wallet)  
+❌ Act as a wallet for users  
+❌ Hold custody of assets  
+
+---
+
+## 🚀 Quick Start
+
+### For Business Users
+
+1. **Sign up** on the PayFlow dashboard
+2. **Connect your Stellar wallet** to receive payments
+3. **Create a payment link** for your product or service
+4. **Share the link** with your customer
+5. **Get paid** directly to your Stellar wallet
+
+### For Developers
+
+```bash
+# Install the SDK
+npm install @payflow/sdk
+
+# Create a payment
+import { PayFlow } from '@payflow/sdk';
+
+const payflow = new PayFlow({ apiKey: 'your-key' });
+const payment = await payflow.paymentIntents.create({
+  amount: '50',
+  asset: 'USDC',
+  recipient: 'your-stellar-address',
+});
 ```
 
-## Technology Stack
+---
 
-### Frontend
-- **Next.js 16**: React framework with App Router
-- **TypeScript**: Type-safe development
-- **Tailwind CSS**: Utility-first styling
-- **QRCode**: QR code generation
-
-### Backend
-- **Node.js 18**: JavaScript runtime
-- **Fastify**: High-performance web framework
-- **TypeScript**: Type-safe development
-- **PostgreSQL**: Relational database
-- **Drizzle ORM**: Type-safe database queries
-
-### Blockchain
-- **Stellar SDK**: Stellar blockchain integration
-- **Soroban SDK**: Smart contract development
-- **Rust**: Smart contract language
-
-### Testing
-- **Vitest**: Unit testing
-- **Supertest**: API testing
-- **Playwright**: End-to-end testing
-
-### Infrastructure
-- **Docker**: Containerization
-- **Docker Compose**: Local development
-- **GitHub Actions**: CI/CD
-
-### Package Management
-- **pnpm**: Fast, disk space efficient package manager
-
-## Repository Structure
+## 💡 How It Works
 
 ```
-PayFlow/
-├── apps/
-│   ├── web/                 # Next.js frontend application
-│   │   ├── app/
-│   │   │   ├── dashboard/   # Merchant dashboard
-│   │   │   ├── pay/         # Payment link pages
-│   │   │   └── page.tsx     # Landing page
-│   │   └── package.json
-│   └── api/                 # Fastify backend API
-│       ├── src/
-│       │   ├── routes/      # API route handlers
-│       │   ├── services/    # Business logic
-│       │   ├── plugins/     # Fastify plugins
-│       │   └── index.ts     # Server entry point
-│       └── package.json
-├── packages/
-│   ├── database/            # Database schema and client
-│   ├── stellar/             # Stellar integration utilities
-│   ├── types/               # Shared TypeScript types
-│   ├── sdk/                 # TypeScript SDK
-│   ├── config/              # Shared configuration
-│   └── testing/             # Testing utilities
-├── contracts/
-│   └── payment/             # Soroban smart contract
-│       ├── src/
-│       │   └── lib.rs       # Contract implementation
-│       └── Cargo.toml
-├── docs/
-│   └── contracts.md         # Contract documentation
-├── .github/
-│   ├── workflows/           # GitHub Actions CI
-│   └── ISSUE_TEMPLATE/      # Issue templates
-├── docker-compose.yml       # Docker Compose configuration
-├── package.json             # Root package.json
-└── pnpm-workspace.yaml      # pnpm workspace configuration
+Customer → Payment Link → PayFlow → Stellar Network → Your Wallet
 ```
 
-## Local Development
+1. **You** create a payment link or invoice
+2. **Customer** opens the link and pays with their Stellar wallet
+3. **PayFlow** processes the transaction on Stellar
+4. **Stellar** confirms the payment on the blockchain
+5. **You** receive the funds directly in your wallet
+6. **PayFlow** notifies you via webhook
+
+---
+
+## 🌟 Key Features
+
+### For Merchants
+- **Payment Links**: Shareable links for one-time payments
+- **Invoices**: Professional invoices with due dates
+- **Dashboard**: Track all payments in one place
+- **QR Codes**: Easy mobile payments
+- **Webhooks**: Real-time payment notifications
+
+### For Developers
+- **Simple API**: RESTful API with clear documentation
+- **TypeScript SDK**: Type-safe client library
+- **Idempotency**: Prevent duplicate payments
+- **Webhooks**: Event-driven architecture
+- **Testnet Support**: Free testing environment
+
+### Technical Highlights
+- **Stellar Testnet**: Built on Stellar's test network
+- **Soroban Smart Contract**: Secure payment escrow
+- **PostgreSQL**: Reliable data storage
+- **Fastify**: High-performance API
+- **Docker**: Easy deployment
+
+---
+
+## 📊 Architecture
+
+PayFlow consists of three main parts:
+
+1. **Frontend Dashboard**: Where you manage payments (Next.js)
+2. **Backend API**: Processes payment requests (Fastify)
+3. **Smart Contract**: Secure payment escrow on Stellar (Soroban)
+
+All components work together to provide a seamless payment experience.
+
+---
+
+## 🛠️ Technology Stack
+
+**Frontend**
+- Next.js 16 (React framework)
+- TypeScript (type safety)
+- Tailwind CSS (styling)
+
+**Backend**
+- Node.js 18
+- Fastify (web framework)
+- PostgreSQL (database)
+- Drizzle ORM (database queries)
+
+**Blockchain**
+- Stellar SDK (blockchain integration)
+- Soroban (smart contracts)
+- Rust (contract language)
+
+---
+
+## 📦 Installation
 
 ### Prerequisites
-
 - Node.js 18+
 - pnpm 8+
 - PostgreSQL 15+
-- Rust 1.70+ (for contract development)
-- Docker (optional, for containerized development)
+- Docker (optional)
 
-### Installation
+### Setup
 
-1. Clone the repository:
 ```bash
+# Clone the repository
 git clone https://github.com/your-org/payflow.git
 cd payflow
-```
 
-2. Install pnpm (if not already installed):
-```bash
+# Install dependencies
 npm install -g pnpm@8.15.0
-```
-
-3. Install dependencies:
-```bash
 pnpm install
-```
 
-### Environment Variables
+# Set up environment variables
+cp apps/api/.env.example apps/api/.env
+# Edit apps/api/.env with your settings
 
-Create a `.env` file in the root directory:
-
-```env
-# Server
-PORT=3001
-HOST=0.0.0.0
-NODE_ENV=development
-
-# Database
-DATABASE_URL=postgresql://postgres:postgres@localhost:5432/payflow
-
-# JWT
-JWT_SECRET=your-super-secret-jwt-key-change-in-production
-
-# Stellar
-STELLAR_NETWORK_PASSPHRASE=Test SDF Network ; September 2015
-STELLAR_RPC_URL=https://soroban-testnet.stellar.org
-STELLAR_HORIZON_URL=https://horizon-testnet.stellar.org
-STELLAR_USDC_ISSUER=GBBD47IFQFJLVQAMZEDS2N7TU7VA7K7XXQDGFO2UPHTM4JUW7RZMOBKE
-STELLAR_USDC_CODE=USDC
-
-# Soroban Contract
-CONTRACT_ADDRESS=
-
-# Webhook
-WEBHOOK_SECRET=your-webhook-secret-for-signing
-WEBHOOK_TIMEOUT_MS=5000
-WEBHOOK_MAX_RETRIES=5
-
-# Rate Limiting
-RATE_LIMIT_TTL=60
-RATE_LIMIT_MAX=100
-```
-
-### Database Setup
-
-#### Option 1: Using Docker Compose
-
-```bash
+# Start PostgreSQL
 docker-compose up -d postgres
-```
 
-#### Option 2: Local PostgreSQL
-
-1. Start PostgreSQL service
-2. Create database:
-```bash
-createdb payflow
-```
-
-3. Run migrations:
-```bash
+# Run database migrations
 pnpm db:generate
 pnpm db:migrate
-```
 
-### Running the Application
-
-#### Start all services:
-
-```bash
+# Start the application
 pnpm dev
 ```
 
-#### Start individual services:
+The dashboard will be available at `http://localhost:3000` and the API at `http://localhost:3001`.
 
-```bash
-# Frontend
-pnpm --filter frontend dev
+---
 
-# Backend API
-pnpm --filter @payflow/api dev
-```
+## 🌐 Stellar Testnet
 
-### Building for Production
+PayFlow uses Stellar's test network for development and testing.
 
-```bash
-# Build all packages
-pnpm build
+### Getting Testnet Funds
 
-# Build individual packages
-pnpm --filter frontend build
-pnpm --filter @payflow/api build
-pnpm --filter @payflow/sdk build
-```
-
-## Stellar Testnet Setup
-
-PayFlow uses Stellar Testnet for development and testing.
-
-### Supported Assets
-
-- **USDC**: Testnet USDC (Issuer: `GBBD47IFQFJLVQAMZEDS2N7TU7VA7K7XXQDGFO2UPHTM4JUW7RZMOBKE`)
-- **XLM**: Native Stellar Lumens
-
-### Testnet Funding
-
-To get testnet funds:
-
-1. Create a Stellar testnet account using a wallet like [Stellar Laboratory](https://laboratory.stellar.org/)
-2. Use Friendbot to fund your account:
+1. Create a testnet account at [Stellar Laboratory](https://laboratory.stellar.org/)
+2. Fund your account with Friendbot:
 ```bash
 curl "https://friendbot.stellar.org?addr=YOUR_PUBLIC_KEY"
 ```
 
-### Network Configuration
+### Supported Assets
+- **USDC**: Testnet USDC (stablecoin)
+- **XLM**: Native Stellar Lumens
 
-- **Network Passphrase**: `Test SDF Network ; September 2015`
-- **RPC URL**: `https://soroban-testnet.stellar.org`
-- **Horizon URL**: `https://horizon-testnet.stellar.org`
+### Network Details
+- **Network**: Test SDF Network ; September 2015
+- **RPC**: https://soroban-testnet.stellar.org
+- **Horizon**: https://horizon-testnet.stellar.org
 
-## Smart Contract Information
+---
 
-### Contract Architecture
+## 🔐 Smart Contract
 
-The PayFlow Soroban contract implements a payment escrow/settlement mechanism with the following features:
+PayFlow uses a Soroban smart contract for secure payment escrow.
 
-- **Payment Escrow**: Secure holding of funds between payer and payee
-- **State Management**: Clear state machine for payment lifecycle
-- **Authorization**: Proper authorization checks for all operations
-- **Event Emission**: Meaningful events for off-chain monitoring
+### Contract Features
+- Payment escrow between payer and payee
+- State management (Created → Funded → Released/Refunded)
+- Authorization checks on all operations
+- Event emission for monitoring
 
 ### Contract Functions
-
-- `initialize(owner: Address)`: Initialize the contract with an owner
-- `create_payment(payer, payee, amount, asset)`: Create a new payment escrow
-- `fund_payment(payment_id)`: Transfer funds to the payment escrow
-- `release_payment(payment_id)`: Release funds to the payee
-- `refund_payment(payment_id)`: Refund funds back to the payer
-- `cancel_payment(payment_id)`: Cancel a payment before funding
-- `get_payment(payment_id)`: Get payment details
-- `get_escrow()`: Get the entire escrow state
+- `initialize`: Set up the contract
+- `create_payment`: Create payment escrow
+- `fund_payment`: Transfer funds to escrow
+- `release_payment`: Release funds to payee
+- `refund_payment`: Return funds to payer
+- `cancel_payment`: Cancel before funding
 
 ### Contract Deployment
 
-The contract has been built and is ready for deployment. Due to CLI compatibility issues, manual deployment is recommended. See `docs/contracts.md` for detailed deployment instructions.
+**Contract deployed to Stellar Testnet**
 
-### Contract Testing
+- **Contract ID**: `CBOPC7Z64MXDAQKHFM2TQYVCPG7BJY7VX6FQDWQENTOFJBL3AJEBKO7C`
+- **Transaction Hash**: `a7687edb2005dccaa6fb787ddf37475e3edc23b579c9b5a2e59b9978fc84f7d9`
+- **Explorer**: https://stellar.expert/explorer/testnet/tx/a7687edb2005dccaa6fb787ddf37475e3edc23b579c9b5a2e59b9978fc84f7d9
+- **Contract Explorer**: https://lab.stellar.org/r/testnet/contract/CBOPC7Z64MXDAQKHFM2TQYVCPG7BJY7VX6FQDWQENTOFJBL3AJEBKO7C
 
-Run contract tests:
+### Manual Contract Deployment Commands
+
+If you need to redeploy the contract:
 
 ```bash
+# 1. Build the contract
 cd contracts/payment
-cargo test
+cargo build --target wasm32-unknown-unknown --release
+
+# 2. Generate a deployer key
+soroban keys generate deployer --network testnet --rpc-url https://soroban-testnet.stellar.org --network-passphrase "Test SDF Network ; September 2015"
+
+# 3. Fund the deployer account
+curl "https://friendbot.stellar.org?addr=DEPLOYER_PUBLIC_KEY"
+
+# 4. Install the contract
+soroban contract install \
+  --wasm target/wasm32-unknown-unknown/release/payflow_contract.wasm \
+  --source deployer \
+  --network testnet \
+  --rpc-url https://soroban-testnet.stellar.org \
+  --network-passphrase "Test SDF Network ; September 2015"
+
+# 5. Deploy the contract (replace WASM_HASH with output from install)
+soroban contract deploy \
+  --source-account DEPLOYER_PUBLIC_KEY \
+  --rpc-url https://soroban-testnet.stellar.org \
+  --network-passphrase "Test SDF Network ; September 2015" \
+  --wasm-hash WASM_HASH
+
+# 6. Initialize the contract (replace CONTRACT_ID with output from deploy)
+soroban contract invoke \
+  --id CONTRACT_ID \
+  --source deployer \
+  --network testnet \
+  --rpc-url https://soroban-testnet.stellar.org \
+  --network-passphrase "Test SDF Network ; September 2015" \
+  initialize \
+  --owner YOUR_PUBLIC_KEY
 ```
 
-## API Documentation
+**Important**: Record the contract ID and deployment transaction hash after deployment.
+
+---
+
+## 📚 API Documentation
 
 ### Authentication
 
@@ -321,8 +273,6 @@ All API endpoints require authentication via JWT token or API key.
 #### Register
 ```http
 POST /api/v1/auth/register
-Content-Type: application/json
-
 {
   "email": "merchant@example.com",
   "password": "securepassword",
@@ -334,8 +284,6 @@ Content-Type: application/json
 #### Login
 ```http
 POST /api/v1/auth/login
-Content-Type: application/json
-
 {
   "email": "merchant@example.com",
   "password": "securepassword"
@@ -344,32 +292,22 @@ Content-Type: application/json
 
 ### Payment Intents
 
-#### Create Payment Intent
+#### Create Payment
 ```http
 POST /api/v1/payment-intents
 Authorization: Bearer <token>
 Idempotency-Key: abc123
-Content-Type: application/json
-
 {
   "amount": "50",
   "asset": "USDC",
   "recipient": "G...",
-  "metadata": {
-    "order_id": "12345"
-  }
+  "metadata": { "order_id": "12345" }
 }
 ```
 
-#### Get Payment Intent
+#### Get Payment
 ```http
 GET /api/v1/payment-intents/:id
-Authorization: Bearer <token>
-```
-
-#### List Payment Intents
-```http
-GET /api/v1/payment-intents?limit=50&offset=0&status=CONFIRMED
 Authorization: Bearer <token>
 ```
 
@@ -379,34 +317,27 @@ Authorization: Bearer <token>
 ```http
 POST /api/v1/invoices
 Authorization: Bearer <token>
-Content-Type: application/json
-
 {
   "invoiceNumber": "INV-001",
   "customerName": "Jane Doe",
   "customerEmail": "jane@example.com",
-  "description": "Web Development Services",
+  "description": "Services",
   "amount": "500",
   "asset": "USDC",
   "dueDate": "2026-10-01"
 }
 ```
 
-#### Send Invoice
-```http
-POST /api/v1/invoices/:id/send
-Authorization: Bearer <token>
-```
+---
 
-## SDK Usage
+## 🔌 SDK Usage
 
 Install the SDK:
-
 ```bash
 npm install @payflow/sdk
 ```
 
-### Example Usage
+### Example
 
 ```typescript
 import { PayFlow } from '@payflow/sdk';
@@ -416,15 +347,13 @@ const payflow = new PayFlow({
   apiUrl: 'https://api.payflow.io/api/v1',
 });
 
-// Create a payment intent
+// Create a payment
 const payment = await payflow.paymentIntents.create({
   amount: '50',
   asset: 'USDC',
   recipient: 'G...',
   idempotencyKey: 'unique-key-123',
 });
-
-console.log('Payment created:', payment.id);
 
 // Create an invoice
 const invoice = await payflow.invoices.create({
@@ -440,22 +369,26 @@ const invoice = await payflow.invoices.create({
 await payflow.invoices.send(invoice.id);
 ```
 
-## Payment Flow
+---
 
-1. **Merchant creates payment intent** via API or dashboard
-2. **Payment link generated** for customer
-3. **Customer opens payment link** and connects wallet
-4. **Customer makes payment** using Stellar wallet
-5. **Transaction submitted** to Stellar network
-6. **PayFlow monitors** transaction status
-7. **Payment verified** against expected amount, recipient, and asset
-8. **Payment status updated** to CONFIRMED
-9. **Webhook delivered** to merchant's configured endpoint
-10. **Dashboard updated** with payment information
+## 🔄 Payment Flow
 
-## Webhook Documentation
+1. **You** create a payment intent via API or dashboard
+2. **PayFlow** generates a payment link
+3. **Customer** opens the link and connects their wallet
+4. **Customer** makes payment using their Stellar wallet
+5. **Transaction** is submitted to Stellar network
+6. **PayFlow** monitors transaction status
+7. **Payment** is verified against expected details
+8. **Status** updates to CONFIRMED
+9. **Webhook** is sent to your configured endpoint
+10. **Dashboard** shows the completed payment
 
-### Webhook Events
+---
+
+## 🔔 Webhooks
+
+### Events
 
 - `payment.created`: Payment intent created
 - `payment.pending`: Payment submitted to network
@@ -466,22 +399,9 @@ await payflow.invoices.send(invoice.id);
 - `invoice.paid`: Invoice paid
 - `invoice.expired`: Invoice expired
 
-### Webhook Payload
+### Verification
 
-```json
-{
-  "event": "payment.confirmed",
-  "payment_id": "pi_xxx",
-  "transaction_hash": "...",
-  "amount": "50",
-  "asset": "USDC",
-  "timestamp": "2026-09-01T10:30:00Z"
-}
-```
-
-### Webhook Signature
-
-PayFlow signs webhook payloads using HMAC-SHA256. Verify signatures using your webhook secret:
+PayFlow signs webhooks with HMAC-SHA256. Verify signatures using your webhook secret:
 
 ```typescript
 import crypto from 'crypto';
@@ -498,24 +418,14 @@ if (signature !== expectedSignature) {
 }
 ```
 
-### Webhook Retry Logic
+---
 
-- **Initial timeout**: 5 seconds
-- **Retry strategy**: Exponential backoff (1s, 2s, 4s, 8s, 16s)
-- **Max retries**: 5 attempts
-- **Max backoff**: 60 seconds
-
-## Testing
-
-### Run All Tests
+## 🧪 Testing
 
 ```bash
+# Run all tests
 pnpm test
-```
 
-### Run Specific Tests
-
-```bash
 # Contract tests
 cd contracts/payment && cargo test
 
@@ -524,38 +434,45 @@ pnpm --filter @payflow/api test
 
 # SDK tests
 pnpm --filter @payflow/sdk test
-
-# E2E tests
-pnpm --filter frontend test
 ```
 
-### Test Coverage
+---
+
+## 🐳 Docker
+
+Start all services with Docker Compose:
 
 ```bash
-pnpm --filter @payflow/api test --coverage
+docker-compose up -d
 ```
 
-## Security
+This starts:
+- PostgreSQL database
+- Backend API
+- Frontend dashboard
+
+---
+
+## 🔒 Security
 
 PayFlow implements multiple security measures:
 
-- **API Key Hashing**: API keys are hashed before storage
-- **Input Validation**: All inputs are validated before processing
-- **Authentication**: JWT-based authentication with secure token handling
-- **Authorization**: Role-based access control
+- **API Key Hashing**: Keys are hashed before storage
+- **Input Validation**: All inputs are validated
+- **Authentication**: JWT-based auth with secure tokens
 - **Rate Limiting**: API rate limiting to prevent abuse
 - **Webhook Signatures**: HMAC-SHA256 signature verification
-- **Idempotency**: Prevent duplicate payment creation
-- **Environment Variables**: Sensitive data stored in environment variables
+- **Idempotency**: Prevent duplicate payments
 - **Transaction Verification**: Backend verification of all transactions
 - **No Private Keys**: Private keys never committed to Git
-- **No Secrets in Logs**: Sensitive data excluded from logs
 
-For detailed security information, see `SECURITY.md`.
+See `SECURITY.md` for detailed security information.
 
-## Roadmap
+---
 
-### Phase 1 (Current - MVP)
+## 🗺️ Roadmap
+
+### Phase 1 (Current - MVP) ✅
 - ✅ Merchant account system
 - ✅ Payment intents
 - ✅ Payment links
@@ -566,10 +483,9 @@ For detailed security information, see `SECURITY.md`.
 - ✅ TypeScript SDK
 - ✅ Soroban smart contract
 
-### Phase 2 (Near Future)
+### Phase 2 (Coming Soon)
 - [ ] Mainnet support
 - [ ] Multi-asset support
-- [ ] Advanced webhook filtering
 - [ ] Payment analytics
 - [ ] Recurring payments
 - [ ] Subscriptions
@@ -583,11 +499,12 @@ For detailed security information, see `SECURITY.md`.
 - [ ] White-label solution
 - [ ] Enterprise features
 - [ ] Compliance tools
-- [ ] Advanced reporting
 
-## Contributing
+---
 
-We welcome contributions! Please see `CONTRIBUTOR.md` for detailed guidelines.
+## 🤝 Contributing
+
+We welcome contributions! See `CONTRIBUTOR.md` for guidelines.
 
 ### Quick Start
 
@@ -597,25 +514,23 @@ We welcome contributions! Please see `CONTRIBUTOR.md` for detailed guidelines.
 4. Add tests
 5. Submit a pull request
 
-### Development Guidelines
+---
 
-- Follow the existing code style
-- Write tests for new features
-- Update documentation
-- Ensure all tests pass
-- Follow commit message conventions
-
-## License
+## 📄 License
 
 MIT License - see [LICENSE](LICENSE) for details.
 
-## Support
+---
+
+## 💬 Support
 
 - **Documentation**: [docs/](docs/)
 - **Issues**: [GitHub Issues](https://github.com/your-org/payflow/issues)
 - **Discussions**: [GitHub Discussions](https://github.com/your-org/payflow/discussions)
 
-## Acknowledgments
+---
+
+## 🙏 Acknowledgments
 
 - Stellar Development Foundation for the Stellar network
 - Soroban team for the smart contract platform
