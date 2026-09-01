@@ -37,6 +37,10 @@ yarn-error.log*
 .env.test.local
 .env.production.local
 
+# Next.js agent files
+AGENTS.md
+CLAUDE.md
+
 # vercel
 .vercel
 
