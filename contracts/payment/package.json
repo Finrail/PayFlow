@@ -1,0 +1,14 @@
+{
+  "name": "@payflow/contract",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "build": "cargo build --target wasm32-unknown-unknown --release",
+    "test": "cargo test",
+    "deploy:testnet": "node scripts/deploy-testnet.js"
+  },
+  "devDependencies": {
+    "@stellar/stellar-sdk": "^12.1.0",
+    "dotenv": "^16.4.0"
+  }
+}

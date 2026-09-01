@@ -1,0 +1,67 @@
+# Dependencies
+node_modules/
+.pnp
+.pnp.js
+
+# Testing
+coverage/
+*.lcov
+playwright-report/
+test-results/
+
+# Next.js
+.next/
+out/
+build/
+dist/
+
+# Production
+*.log
+logs/
+
+# Misc
+.DS_Store
+*.pem
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# Vercel
+.vercel
+
+# TypeScript
+*.tsbuildinfo
+next-env.d.ts
+
+# Rust
+/target/
+**/*.rs.bk
+Cargo.lock
+
+# Soroban
+.wasm
+.wasm.txt
+
+# Database
+*.db
+*.sqlite
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+Thumbs.db
+
+# Soroban contract WASM
+contracts/payment/target/wasm32-unknown-unknown/release/*.wasm
+
+# Soroban keys
+*.soroban
+
+docs/github-issues.md

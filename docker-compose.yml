@@ -1,0 +1,73 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:15-alpine
+    container_name: payflow-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: payflow
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  api:
+    build:
+      context: .
+      dockerfile: apps/api/Dockerfile
+    container_name: payflow-api
+    restart: unless-stopped
+    environment:
+      NODE_ENV: development
+      PORT: 3001
+      HOST: 0.0.0.0
+      DATABASE_URL: postgresql://postgres:postgres@postgres:5432/payflow
+      JWT_SECRET: your-super-secret-jwt-key-change-in-production
+      STELLAR_NETWORK_PASSPHRASE: Test SDF Network ; September 2015
+      STELLAR_RPC_URL: https://soroban-testnet.stellar.org
+      STELLAR_HORIZON_URL: https://horizon-testnet.stellar.org
+      STELLAR_USDC_ISSUER: GBBD47IFQFJLVQAMZEDS2N7TU7VA7K7XXQDGFO2UPHTM4JUW7RZMOBKE
+      STELLAR_USDC_CODE: USDC
+      WEBHOOK_SECRET: your-webhook-secret-for-signing
+      WEBHOOK_TIMEOUT_MS: 5000
+      WEBHOOK_MAX_RETRIES: 5
+      RATE_LIMIT_TTL: 60
+      RATE_LIMIT_MAX: 100
+    ports:
+      - "3001:3001"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    volumes:
+      - ./apps/api:/app
+      - /app/node_modules
+      - /app/dist
+
+  web:
+    build:
+      context: .
+      dockerfile: apps/web/Dockerfile
+    container_name: payflow-web
+    restart: unless-stopped
+    environment:
+      NODE_ENV: development
+      NEXT_PUBLIC_API_URL: http://localhost:3001/api/v1
+    ports:
+      - "3000:3000"
+    depends_on:
+      - api
+    volumes:
+      - ./apps/web:/app
+      - /app/node_modules
+      - /app/.next
+
+volumes:
+  postgres_data:

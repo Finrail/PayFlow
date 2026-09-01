@@ -1,0 +1,21 @@
+{
+  "name": "@payflow/database",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "db:generate": "drizzle-kit generate",
+    "db:migrate": "drizzle-kit migrate",
+    "db:studio": "drizzle-kit studio",
+    "db:push": "drizzle-kit push"
+  },
+  "dependencies": {
+    "@payflow/types": "workspace:*",
+    "drizzle-orm": "^0.29.3",
+    "pg": "^8.11.3"
+  },
+  "devDependencies": {
+    "@types/pg": "^8.10.9",
+    "drizzle-kit": "^0.20.9",
+    "typescript": "^5.3.3"
+  }
+}
