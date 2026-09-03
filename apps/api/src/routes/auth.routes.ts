@@ -1,8 +1,7 @@
 import { FastifyInstance } from 'fastify';
 import bcrypt from 'bcryptjs';
 import { v4 as uuidv4 } from 'uuid';
-import { getDatabase } from '@payflow/database';
-import { users, merchants } from '@payflow/database/schema';
+import { getDatabase, users, merchants } from '@payflow/database';
 import { eq } from 'drizzle-orm';
 
 interface RegisterBody {
@@ -143,9 +142,13 @@ export async function authRoutes(fastify: FastifyInstance) {
   });
 
   // Verify token
-  fastify.get('/verify', {
-    onRequest: [fastify.authenticate],
-  }, async (request, reply) => {
+  fastify.get('/verify', async (request, reply) => {
+    try {
+      await (fastify as any).authenticate(request, reply);
+    } catch (err) {
+      return reply.send(err);
+    }
+
     const { userId, merchantId } = (request as any).user;
 
     const db = getDatabase();
@@ -160,17 +163,11 @@ export async function authRoutes(fastify: FastifyInstance) {
       });
     }
 
-    const user = userResult[0];
-    const merchant = merchantResult[0];
-
     return reply.send({
-      valid: true,
-      user: {
-        id: user.id,
-        email: user.email,
-        name: merchant.name,
-        businessName: merchant.businessName,
-      },
+      userId,
+      merchantId,
+      email: userResult[0].email,
+      name: merchantResult[0].name,
     });
   });
 }
