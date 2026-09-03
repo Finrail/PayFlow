@@ -66,35 +66,38 @@ export async function validateTransaction(
 ): Promise<boolean> {
   try {
     const server = new StellarSdk.Horizon.Server(STELLAR_HORIZON_URL);
-    const transaction = await server.transactions().transaction(transactionHash);
+    const transaction = await server.transactions().transaction(transactionHash).call();
 
     if (!transaction.successful) {
       return false;
     }
 
-    const operations = transaction.operations;
-    if (!operations || operations.length === 0) {
+    const operations = await transaction.operations();
+    if (!operations || operations.records.length === 0) {
       return false;
     }
 
-    const paymentOp = operations.find((op: any) => op.type === 'payment');
+    const paymentOp = operations.records.find((op: any) => op.type === 'payment');
     if (!paymentOp) {
       return false;
     }
 
     // Verify recipient
-    if (paymentOp.to !== expectedRecipient) {
+    if ((paymentOp as any).destination !== expectedRecipient) {
       return false;
     }
 
     // Verify amount
-    const amount = parseFloat(paymentOp.amount);
-    if (Math.abs(amount - parseFloat(expectedAmount)) > 0.000001) {
+    const amount = parseFloat((paymentOp as any).amount);
+    if (amount !== parseFloat(expectedAmount)) {
       return false;
     }
 
     // Verify asset
-    if (paymentOp.asset_code !== expectedAsset) {
+    const assetCode = (paymentOp as any).asset_code;
+    const assetIssuer = (paymentOp as any).asset_issuer;
+    const asset = assetCode === 'XLM' ? 'XLM' : `${assetCode}:${assetIssuer}`;
+    if (asset !== expectedAsset) {
       return false;
     }
 
