@@ -1,4 +1,4 @@
-import { allowAccess, isConnected, getUserInfo, signTransaction } from '@stellar/freighter-api';
+import { isConnected, getUserInfo, signTransaction } from '@stellar/freighter-api';
 import {
   Account,
   Asset,
@@ -52,7 +52,6 @@ export async function isFreighterInstalled(): Promise<boolean> {
  */
 export async function connectWallet(): Promise<WalletInfo> {
   try {
-    await allowAccess();
     const userInfo = await getUserInfo();
     const publicKey = userInfo.publicKey;
     
@@ -105,10 +104,25 @@ export async function getAccountBalance(publicKey: string): Promise<{ asset: str
     const server = new Horizon.Server(HORIZON_URL);
     const account = await server.loadAccount(publicKey);
     
-    return account.balances.map((balance) => ({
-      asset: balance.asset_code || 'XLM',
-      balance: balance.balance,
-    }));
+    return account.balances.map((balance) => {
+      // Handle different balance types
+      if ('asset_type' in balance && balance.asset_type === 'native') {
+        return {
+          asset: 'XLM',
+          balance: balance.balance,
+        };
+      } else if ('asset_code' in balance) {
+        return {
+          asset: `${balance.asset_code}:${balance.asset_issuer}`,
+          balance: balance.balance,
+        };
+      } else {
+        return {
+          asset: 'Unknown',
+          balance: balance.balance,
+        };
+      }
+    });
   } catch (error) {
     console.error('Error loading account balance:', error);
     return [];
