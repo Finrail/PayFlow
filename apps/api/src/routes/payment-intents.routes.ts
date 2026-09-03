@@ -1,16 +1,20 @@
 import { FastifyInstance } from 'fastify';
 import { v4 as uuidv4 } from 'uuid';
-import { getDatabase } from '@payflow/database';
-import { paymentIntents, merchants } from '@payflow/database/schema';
+import { getDatabase, paymentIntents, merchants } from '@payflow/database';
 import { eq, and } from 'drizzle-orm';
 import { validateStellarAddress, validateAsset } from '@payflow/stellar';
 import type { CreatePaymentIntentRequest } from '@payflow/types';
 
 export async function paymentIntentsRoutes(fastify: FastifyInstance) {
   // Create payment intent
-  fastify.post<{ Body: CreatePaymentIntentRequest }>('/', {
-    onRequest: [fastify.authenticate, fastify.apiKeyAuth],
-  }, async (request, reply) => {
+  fastify.post<{ Body: CreatePaymentIntentRequest }>('/', async (request, reply) => {
+    try {
+      await (fastify as any).authenticate(request, reply);
+      await (fastify as any).apiKeyAuth(request, reply);
+    } catch (err) {
+      return reply.send(err);
+    }
+
     const { amount, asset, recipient, metadata, idempotencyKey } = request.body;
     const { merchantId } = (request as any).user;
 
@@ -82,9 +86,13 @@ export async function paymentIntentsRoutes(fastify: FastifyInstance) {
   });
 
   // Get payment intent by ID
-  fastify.get('/:id', {
-    onRequest: [fastify.authenticate, fastify.apiKeyAuth],
-  }, async (request, reply) => {
+  fastify.get('/:id', async (request, reply) => {
+    try {
+      await (fastify as any).authenticate(request, reply);
+      await (fastify as any).apiKeyAuth(request, reply);
+    } catch (err) {
+      return reply.send(err);
+    }
     const { id } = request.params as { id: string };
     const { merchantId } = (request as any).user;
 
@@ -109,9 +117,13 @@ export async function paymentIntentsRoutes(fastify: FastifyInstance) {
   });
 
   // List payment intents
-  fastify.get('/', {
-    onRequest: [fastify.authenticate, fastify.apiKeyAuth],
-  }, async (request, reply) => {
+  fastify.get('/', async (request, reply) => {
+    try {
+      await (fastify as any).authenticate(request, reply);
+      await (fastify as any).apiKeyAuth(request, reply);
+    } catch (err) {
+      return reply.send(err);
+    }
     const { merchantId } = (request as any).user;
     const { limit = 50, offset = 0, status } = request.query as { limit?: number; offset?: number; status?: string };
 
