@@ -1,3 +1,4 @@
+import 'dotenv/config';
 import Fastify from 'fastify';
 import cors from '@fastify/cors';
 import jwt from '@fastify/jwt';
@@ -120,6 +121,11 @@ async function start() {
 
     await fastify.register(authPlugin);
 
+    // Register routes after auth plugin is loaded
+    await fastify.register(authRoutes, { prefix: '/api/v1/auth' });
+    await fastify.register(paymentIntentsRoutes, { prefix: '/api/v1/payment-intents' });
+    await fastify.register(invoiceRoutes, { prefix: '/api/v1/invoices' });
+
     // Start background services
     if (process.env.NODE_ENV !== 'test') {
       paymentMonitor.start();
@@ -151,11 +157,6 @@ async function start() {
       status: 'ready',
       timestamp: new Date().toISOString(),
     }));
-
-    // API routes
-    await fastify.register(authRoutes, { prefix: '/api/v1/auth' });
-    await fastify.register(paymentIntentsRoutes, { prefix: '/api/v1/payment-intents' });
-    await fastify.register(invoiceRoutes, { prefix: '/api/v1/invoices' });
 
     const port = parseInt(fastify.config.PORT);
     const host = fastify.config.HOST;
