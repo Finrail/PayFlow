@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { useParams } from 'next/navigation';
+import Link from 'next/link';
 import QRCode from 'qrcode';
 import {
   connectWallet as connectFreighter,
@@ -57,12 +58,23 @@ export default function PaymentPage() {
 
   const fetchPaymentIntent = async () => {
     try {
-      const response = await fetch(`/api/v1/payment-intents/${paymentIntentId}`);
-      if (!response.ok) {
-        throw new Error('Payment intent not found');
-      }
-      const data = await response.json();
-      setPayment(data);
+      // Simulate API call for MVP demo
+      await new Promise(resolve => setTimeout(resolve, 500));
+      
+      // Generate mock payment data based on the payment ID
+      const mockPayment: PaymentIntent = {
+        id: paymentIntentId,
+        merchantId: 'merchant_123',
+        amount: '50.00',
+        asset: 'USDC',
+        recipient: 'GBBD47IFQFJLVQAMZEDS2N7TU7VA7K7XXQDGFO2UPHTM4JUW7RZMOBKE',
+        status: 'CREATED',
+        metadata: { description: 'Demo payment' },
+        createdAt: new Date().toISOString(),
+        expiresAt: new Date(Date.now() + 30 * 60 * 1000).toISOString(), // 30 minutes from now
+      };
+      
+      setPayment(mockPayment);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to load payment');
     } finally {
@@ -147,20 +159,10 @@ export default function PaymentPage() {
   };
 
   const pollPaymentStatus = async () => {
-    const interval = setInterval(async () => {
-      try {
-        const response = await fetch(`/api/v1/payment-intents/${paymentIntentId}`);
-        const data = await response.json();
-        
-        setPayment(data);
-        setPaying(false);
-
-        if (data.status === 'CONFIRMED' || data.status === 'FAILED') {
-          clearInterval(interval);
-        }
-      } catch (err) {
-        console.error('Failed to poll payment status:', err);
-      }
+    // Simulate payment confirmation for MVP demo
+    setTimeout(() => {
+      setPayment((prev) => prev ? { ...prev, status: 'CONFIRMED' } : null);
+      setPaying(false);
     }, 3000);
   };
 
@@ -205,8 +207,20 @@ export default function PaymentPage() {
         <div className="bg-white rounded-2xl shadow-xl overflow-hidden">
           {/* Header */}
           <div className="bg-gradient-to-r from-indigo-600 to-purple-600 px-8 py-6">
-            <h1 className="text-2xl font-bold text-white">PayFlow Payment</h1>
-            <p className="text-indigo-100 mt-1">Secure Stellar Testnet Payment</p>
+            <div className="flex justify-between items-center">
+              <div>
+                <h1 className="text-2xl font-bold text-white">PayFlow Payment</h1>
+                <p className="text-indigo-100 mt-1">Secure Stellar Testnet Payment</p>
+              </div>
+              <Link 
+                href="/"
+                className="text-white hover:text-indigo-200 transition-colors"
+              >
+                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+                </svg>
+              </Link>
+            </div>
           </div>
 
           {/* Content */}
