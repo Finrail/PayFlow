@@ -7,7 +7,8 @@ export default function Home() {
       <header className="bg-white border-b border-gray-200">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
-            <div className="flex items-center">
+            <div className="flex items-center space-x-2">
+              <img src="/payflow-logo.png" alt="PayFlow" className="h-8 w-8" />
               <h1 className="text-2xl font-bold text-indigo-600">PayFlow</h1>
             </div>
             <nav className="flex space-x-8">
@@ -25,6 +26,9 @@ export default function Home() {
       {/* Hero Section */}
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
         <div className="text-center">
+          <div className="mb-8">
+            <img src="/payflow-logo.png" alt="PayFlow" className="h-24 w-24 mx-auto" />
+          </div>
           <h1 className="text-5xl font-bold text-gray-900 mb-6">
             Accept Stellar Payments with Ease
           </h1>
@@ -34,13 +38,13 @@ export default function Home() {
           <div className="flex justify-center gap-4">
             <Link
               href="/dashboard"
-              className="bg-indigo-600 text-white px-8 py-3 rounded-lg font-semibold hover:bg-indigo-700 transition-colors"
+              className="bg-indigo-600 text-white px-8 py-3 rounded-lg font-semibold hover:bg-indigo-700 transition-colors shadow-lg"
             >
               Get Started
             </Link>
             <Link
               href="https://github.com/Finrail/PayFlow"
-              className="bg-white text-gray-700 px-8 py-3 rounded-lg font-semibold hover:bg-gray-50 transition-colors border border-gray-300"
+              className="bg-white text-gray-700 px-8 py-3 rounded-lg font-semibold hover:bg-gray-50 transition-colors border border-gray-300 shadow-md"
             >
               View on GitHub
             </Link>
@@ -49,33 +53,33 @@ export default function Home() {
 
         {/* Features */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mt-20">
-          <div className="bg-white p-6 rounded-lg shadow-md">
-            <div className="w-12 h-12 bg-indigo-100 rounded-lg flex items-center justify-center mb-4">
-              <svg className="w-6 h-6 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <div className="bg-white p-8 rounded-xl shadow-lg hover:shadow-xl transition-shadow">
+            <div className="w-14 h-14 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-xl flex items-center justify-center mb-4">
+              <svg className="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
               </svg>
             </div>
-            <h3 className="text-lg font-semibold text-gray-900 mb-2">Instant Payments</h3>
+            <h3 className="text-xl font-semibold text-gray-900 mb-2">Instant Payments</h3>
             <p className="text-gray-600">Process payments in seconds on the Stellar network with minimal fees.</p>
           </div>
 
-          <div className="bg-white p-6 rounded-lg shadow-md">
-            <div className="w-12 h-12 bg-indigo-100 rounded-lg flex items-center justify-center mb-4">
-              <svg className="w-6 h-6 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <div className="bg-white p-8 rounded-xl shadow-lg hover:shadow-xl transition-shadow">
+            <div className="w-14 h-14 bg-gradient-to-br from-green-500 to-emerald-600 rounded-xl flex items-center justify-center mb-4">
+              <svg className="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
               </svg>
             </div>
-            <h3 className="text-lg font-semibold text-gray-900 mb-2">Secure & Non-Custodial</h3>
+            <h3 className="text-xl font-semibold text-gray-900 mb-2">Secure & Non-Custodial</h3>
             <p className="text-gray-600">Payments go directly to your wallet. We never hold your funds.</p>
           </div>
 
-          <div className="bg-white p-6 rounded-lg shadow-md">
-            <div className="w-12 h-12 bg-indigo-100 rounded-lg flex items-center justify-center mb-4">
-              <svg className="w-6 h-6 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <div className="bg-white p-8 rounded-xl shadow-lg hover:shadow-xl transition-shadow">
+            <div className="w-14 h-14 bg-gradient-to-br from-orange-500 to-red-600 rounded-xl flex items-center justify-center mb-4">
+              <svg className="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4" />
               </svg>
             </div>
-            <h3 className="text-lg font-semibold text-gray-900 mb-2">Simple API</h3>
+            <h3 className="text-xl font-semibold text-gray-900 mb-2">Simple API</h3>
             <p className="text-gray-600">Easy-to-use REST API and TypeScript SDK for quick integration.</p>
           </div>
         </div>
@@ -84,25 +88,43 @@ export default function Home() {
         <div className="mt-20">
           <h2 className="text-3xl font-bold text-gray-900 text-center mb-12">How It Works</h2>
           <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
-            <div className="text-center">
-              <div className="w-10 h-10 bg-indigo-600 text-white rounded-full flex items-center justify-center mx-auto mb-4 font-bold">1</div>
+            <div className="text-center bg-white p-6 rounded-xl shadow-md">
+              <div className="w-12 h-12 bg-gradient-to-br from-indigo-500 to-purple-600 text-white rounded-full flex items-center justify-center mx-auto mb-4 font-bold text-lg">1</div>
               <h3 className="font-semibold text-gray-900 mb-2">Create Payment</h3>
               <p className="text-gray-600 text-sm">Generate a payment link via API or dashboard</p>
             </div>
-            <div className="text-center">
-              <div className="w-10 h-10 bg-indigo-600 text-white rounded-full flex items-center justify-center mx-auto mb-4 font-bold">2</div>
+            <div className="text-center bg-white p-6 rounded-xl shadow-md">
+              <div className="w-12 h-12 bg-gradient-to-br from-indigo-500 to-purple-600 text-white rounded-full flex items-center justify-center mx-auto mb-4 font-bold text-lg">2</div>
               <h3 className="font-semibold text-gray-900 mb-2">Share Link</h3>
               <p className="text-gray-600 text-sm">Send the payment link to your customer</p>
             </div>
-            <div className="text-center">
-              <div className="w-10 h-10 bg-indigo-600 text-white rounded-full flex items-center justify-center mx-auto mb-4 font-bold">3</div>
+            <div className="text-center bg-white p-6 rounded-xl shadow-md">
+              <div className="w-12 h-12 bg-gradient-to-br from-indigo-500 to-purple-600 text-white rounded-full flex items-center justify-center mx-auto mb-4 font-bold text-lg">3</div>
               <h3 className="font-semibold text-gray-900 mb-2">Customer Pays</h3>
               <p className="text-gray-600 text-sm">Customer pays with their Stellar wallet</p>
             </div>
-            <div className="text-center">
-              <div className="w-10 h-10 bg-indigo-600 text-white rounded-full flex items-center justify-center mx-auto mb-4 font-bold">4</div>
+            <div className="text-center bg-white p-6 rounded-xl shadow-md">
+              <div className="w-12 h-12 bg-gradient-to-br from-indigo-500 to-purple-600 text-white rounded-full flex items-center justify-center mx-auto mb-4 font-bold text-lg">4</div>
               <h3 className="font-semibold text-gray-900 mb-2">Receive Funds</h3>
               <p className="text-gray-600 text-sm">Funds arrive directly in your wallet</p>
+            </div>
+          </div>
+        </div>
+
+        {/* Stats Section */}
+        <div className="mt-20 bg-gradient-to-br from-indigo-600 to-purple-600 rounded-2xl p-12 text-white">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 text-center">
+            <div>
+              <div className="text-4xl font-bold mb-2">&lt;5s</div>
+              <div className="text-indigo-100">Payment Settlement</div>
+            </div>
+            <div>
+              <div className="text-4xl font-bold mb-2">0.01%</div>
+              <div className="text-indigo-100">Transaction Fees</div>
+            </div>
+            <div>
+              <div className="text-4xl font-bold mb-2">100%</div>
+              <div className="text-indigo-100">Non-Custodial</div>
             </div>
           </div>
         </div>
