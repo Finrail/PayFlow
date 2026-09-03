@@ -142,10 +142,6 @@ export const paymentIntentsRelations = relations(paymentIntents, ({ one, many })
     references: [merchants.id],
   }),
   payments: many(payments),
-  invoice: one(invoices, {
-    fields: [invoices.paymentIntentId],
-    references: [paymentIntents.id],
-  }),
 }));
 
 export const paymentsRelations = relations(payments, ({ one }) => ({
