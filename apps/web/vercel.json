@@ -3,35 +3,5 @@
   "devCommand": "npm run dev",
   "installCommand": "npm install",
   "framework": "nextjs",
-  "regions": ["iad1"],
-  "env": {
-    "NEXT_PUBLIC_API_URL": {
-      "description": "PayFlow API URL",
-      "value": "http://localhost:3001/api/v1"
-    },
-    "NEXT_PUBLIC_STELLAR_NETWORK_PASSPHRASE": {
-      "description": "Stellar network passphrase",
-      "value": "Test SDF Network ; September 2015"
-    },
-    "NEXT_PUBLIC_STELLAR_HORIZON_URL": {
-      "description": "Stellar Horizon URL",
-      "value": "https://horizon-testnet.stellar.org"
-    },
-    "NEXT_PUBLIC_STELLAR_RPC_URL": {
-      "description": "Stellar RPC URL",
-      "value": "https://soroban-testnet.stellar.org"
-    },
-    "NEXT_PUBLIC_STELLAR_USDC_ISSUER": {
-      "description": "Stellar USDC issuer address",
-      "value": "GBBD47IFQFJLVQAMZEDS2N7TU7VA7K7XXQDGFO2UPHTM4JUW7RZMOBKE"
-    },
-    "NEXT_PUBLIC_STELLAR_USDC_CODE": {
-      "description": "Stellar USDC asset code",
-      "value": "USDC"
-    },
-    "NEXT_PUBLIC_CONTRACT_ID": {
-      "description": "Soroban contract ID",
-      "value": "CBOPC7Z64MXDAQKHFM2TQYVCPG7BJY7VX6FQDWQENTOFJBL3AJEBKO7C"
-    }
-  }
+  "regions": ["iad1"]
 }
