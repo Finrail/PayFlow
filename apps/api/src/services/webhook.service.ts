@@ -1,7 +1,6 @@
 import crypto from 'crypto';
-import { getDatabase } from '@payflow/database';
-import { webhooks, webhookDeliveries } from '@payflow/database/schema';
-import { eq, and } from 'drizzle-orm';
+import { getDatabase, webhooks, webhookDeliveries } from '@payflow/database';
+import { eq, and, lt } from 'drizzle-orm';
 import type { WebhookPayload, WebhookEvent } from '@payflow/types';
 
 export function signWebhook(payload: WebhookPayload, secret: string): string {
