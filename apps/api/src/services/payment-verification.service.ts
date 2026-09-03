@@ -1,5 +1,4 @@
-import { getDatabase } from '@payflow/database';
-import { paymentIntents, payments } from '@payflow/database/schema';
+import { getDatabase, paymentIntents, payments } from '@payflow/database';
 import { eq, and, lt } from 'drizzle-orm';
 import { validateTransaction, getTransactionDetails } from '@payflow/stellar';
 
