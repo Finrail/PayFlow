@@ -1,15 +1,19 @@
 import { FastifyInstance } from 'fastify';
 import { v4 as uuidv4 } from 'uuid';
-import { getDatabase } from '@payflow/database';
-import { invoices, paymentIntents } from '@payflow/database/schema';
+import { getDatabase, invoices, paymentIntents } from '@payflow/database';
 import { eq, and } from 'drizzle-orm';
 import type { CreateInvoiceRequest } from '@payflow/types';
 
 export async function invoiceRoutes(fastify: FastifyInstance) {
   // Create invoice
-  fastify.post<{ Body: CreateInvoiceRequest }>('/', {
-    onRequest: [fastify.authenticate, fastify.apiKeyAuth],
-  }, async (request, reply) => {
+  fastify.post<{ Body: CreateInvoiceRequest }>('/', async (request, reply) => {
+    try {
+      await (fastify as any).authenticate(request, reply);
+      await (fastify as any).apiKeyAuth(request, reply);
+    } catch (err) {
+      return reply.send(err);
+    }
+
     const { invoiceNumber, customerName, customerEmail, description, amount, asset, dueDate, metadata } = request.body;
     const { merchantId } = (request as any).user;
 
@@ -68,9 +72,13 @@ export async function invoiceRoutes(fastify: FastifyInstance) {
   });
 
   // Get invoice by ID
-  fastify.get('/:id', {
-    onRequest: [fastify.authenticate, fastify.apiKeyAuth],
-  }, async (request, reply) => {
+  fastify.get('/:id', async (request, reply) => {
+    try {
+      await (fastify as any).authenticate(request, reply);
+      await (fastify as any).apiKeyAuth(request, reply);
+    } catch (err) {
+      return reply.send(err);
+    }
     const { id } = request.params as { id: string };
     const { merchantId } = (request as any).user;
 
@@ -95,9 +103,13 @@ export async function invoiceRoutes(fastify: FastifyInstance) {
   });
 
   // List invoices
-  fastify.get('/', {
-    onRequest: [fastify.authenticate, fastify.apiKeyAuth],
-  }, async (request, reply) => {
+  fastify.get('/', async (request, reply) => {
+    try {
+      await (fastify as any).authenticate(request, reply);
+      await (fastify as any).apiKeyAuth(request, reply);
+    } catch (err) {
+      return reply.send(err);
+    }
     const { merchantId } = (request as any).user;
     const { limit = 50, offset = 0, status } = request.query as { limit?: number; offset?: number; status?: string };
 
@@ -120,9 +132,13 @@ export async function invoiceRoutes(fastify: FastifyInstance) {
   });
 
   // Update invoice
-  fastify.patch<{ Body: Partial<CreateInvoiceRequest> }>('/:id', {
-    onRequest: [fastify.authenticate, fastify.apiKeyAuth],
-  }, async (request, reply) => {
+  fastify.patch<{ Body: Partial<CreateInvoiceRequest> }>('/:id', async (request, reply) => {
+    try {
+      await (fastify as any).authenticate(request, reply);
+      await (fastify as any).apiKeyAuth(request, reply);
+    } catch (err) {
+      return reply.send(err);
+    }
     const { id } = request.params as { id: string };
     const { merchantId } = (request as any).user;
     const updates = request.body;
@@ -167,9 +183,13 @@ export async function invoiceRoutes(fastify: FastifyInstance) {
   });
 
   // Send invoice (change status to OPEN)
-  fastify.post('/:id/send', {
-    onRequest: [fastify.authenticate, fastify.apiKeyAuth],
-  }, async (request, reply) => {
+  fastify.post('/:id/send', async (request, reply) => {
+    try {
+      await (fastify as any).authenticate(request, reply);
+      await (fastify as any).apiKeyAuth(request, reply);
+    } catch (err) {
+      return reply.send(err);
+    }
     const { id } = request.params as { id: string };
     const { merchantId } = (request as any).user;
 
@@ -229,9 +249,13 @@ export async function invoiceRoutes(fastify: FastifyInstance) {
   });
 
   // Cancel invoice
-  fastify.post('/:id/cancel', {
-    onRequest: [fastify.authenticate, fastify.apiKeyAuth],
-  }, async (request, reply) => {
+  fastify.post('/:id/cancel', async (request, reply) => {
+    try {
+      await (fastify as any).authenticate(request, reply);
+      await (fastify as any).apiKeyAuth(request, reply);
+    } catch (err) {
+      return reply.send(err);
+    }
     const { id } = request.params as { id: string };
     const { merchantId } = (request as any).user;
 
