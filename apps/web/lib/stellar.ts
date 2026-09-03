@@ -1,4 +1,4 @@
-import { FreighterApi } from '@stellar/freighter-api';
+import { allowAccess, isConnected, getUserInfo, signTransaction } from '@stellar/freighter-api';
 import {
   Account,
   Asset,
@@ -9,9 +9,7 @@ import {
   TransactionBuilder,
   BASE_FEE,
   StrKey,
-} from '@stellar/sdk';
-
-const freighter = new FreighterApi();
+} from '@stellar/stellar-sdk';
 
 // Stellar Testnet configuration
 const NETWORK_PASSPHRASE = Networks.TESTNET;
@@ -41,7 +39,7 @@ export interface PaymentResult {
  */
 export async function isFreighterInstalled(): Promise<boolean> {
   try {
-    const isInstalled = await freighter.isConnected();
+    const isInstalled = await isConnected();
     return isInstalled;
   } catch (error) {
     console.error('Error checking Freighter installation:', error);
@@ -54,7 +52,10 @@ export async function isFreighterInstalled(): Promise<boolean> {
  */
 export async function connectWallet(): Promise<WalletInfo> {
   try {
-    const publicKey = await freighter.getAddress();
+    await allowAccess();
+    const userInfo = await getUserInfo();
+    const publicKey = userInfo.publicKey;
+    
     if (!publicKey) {
       throw new Error('No public key returned from wallet');
     }
@@ -156,7 +157,7 @@ export async function createPayment(
       .build();
 
     // Sign the transaction with Freighter
-    const signedXDR = await freighter.signTransaction(transaction.toXDR());
+    const signedXDR = await signTransaction(transaction.toXDR());
     
     // Submit the transaction
     const signedTransaction = TransactionBuilder.fromXDR(signedXDR, NETWORK_PASSPHRASE) as Transaction;
