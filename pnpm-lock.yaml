@@ -38,6 +38,9 @@ importers:
       '@payflow/types':
         specifier: workspace:*
         version: link:../../packages/types
+      '@stellar/stellar-sdk':
+        specifier: ^12.3.0
+        version: 12.3.0
       bcryptjs:
         specifier: ^2.4.3
         version: 2.4.3
@@ -53,9 +56,6 @@ importers:
       qrcode:
         specifier: ^1.5.3
         version: 1.5.4
-      stellar-sdk:
-        specifier: ^12.1.0
-        version: 12.3.0
       uuid:
         specifier: ^9.0.1
         version: 9.0.1
