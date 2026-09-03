@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import Link from 'next/link';
 
 interface DashboardStats {
   totalPayments: number;
@@ -18,10 +19,25 @@ interface RecentPayment {
   createdAt: string;
 }
 
+interface CreatePaymentForm {
+  amount: string;
+  asset: string;
+  description: string;
+}
+
 export default function DashboardPage() {
   const [stats, setStats] = useState<DashboardStats | null>(null);
   const [recentPayments, setRecentPayments] = useState<RecentPayment[]>([]);
   const [loading, setLoading] = useState(true);
+  const [showCreateModal, setShowCreateModal] = useState(false);
+  const [creatingPayment, setCreatingPayment] = useState(false);
+  const [paymentForm, setPaymentForm] = useState<CreatePaymentForm>({
+    amount: '',
+    asset: 'USDC',
+    description: '',
+  });
+  const [createdPaymentLink, setCreatedPaymentLink] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     fetchDashboardData();
@@ -100,6 +116,56 @@ export default function DashboardPage() {
     }
   };
 
+  const handleCreatePayment = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setCreatingPayment(true);
+    setError(null);
+
+    try {
+      // Simulate API call for MVP demo
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      
+      // Generate a mock payment ID
+      const paymentId = `pi_${Date.now()}`;
+      const paymentLink = `${window.location.origin}/pay/${paymentId}`;
+      setCreatedPaymentLink(paymentLink);
+      
+      // Add to recent payments
+      const newPayment: RecentPayment = {
+        id: paymentId,
+        amount: paymentForm.amount,
+        asset: paymentForm.asset,
+        status: 'CREATED',
+        createdAt: new Date().toISOString(),
+      };
+      setRecentPayments([newPayment, ...recentPayments]);
+      
+      // Reset form
+      setPaymentForm({ amount: '', asset: 'USDC', description: '' });
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to create payment link');
+    } finally {
+      setCreatingPayment(false);
+    }
+  };
+
+  const copyPaymentLink = () => {
+    if (createdPaymentLink) {
+      navigator.clipboard.writeText(createdPaymentLink);
+      alert('Payment link copied to clipboard!');
+    }
+  };
+
+  const copyPaymentLinkById = (paymentId: string) => {
+    const paymentLink = `${window.location.origin}/pay/${paymentId}`;
+    navigator.clipboard.writeText(paymentLink);
+    alert('Payment link copied to clipboard!');
+  };
+
+  const viewPayment = (paymentId: string) => {
+    window.open(`/pay/${paymentId}`, '_blank');
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-50">
@@ -119,7 +185,16 @@ export default function DashboardPage() {
               <p className="text-sm text-gray-500">Manage your Stellar payments</p>
             </div>
             <div className="flex items-center space-x-4">
-              <button className="bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700 transition-colors">
+              <Link 
+                href="/"
+                className="text-gray-600 hover:text-gray-900 transition-colors"
+              >
+                Home
+              </Link>
+              <button 
+                onClick={() => setShowCreateModal(true)}
+                className="bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700 transition-colors"
+              >
                 Create Payment Link
               </button>
               <div className="w-10 h-10 bg-indigo-100 rounded-full flex items-center justify-center">
@@ -227,8 +302,18 @@ export default function DashboardPage() {
                       {new Date(payment.createdAt).toLocaleString()}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-right text-sm">
-                      <button className="text-indigo-600 hover:text-indigo-800 mr-3">View</button>
-                      <button className="text-gray-400 hover:text-gray-600">Copy Link</button>
+                      <button 
+                        onClick={() => viewPayment(payment.id)}
+                        className="text-indigo-600 hover:text-indigo-800 mr-3"
+                      >
+                        View
+                      </button>
+                      <button 
+                        onClick={() => copyPaymentLinkById(payment.id)}
+                        className="text-gray-400 hover:text-gray-600"
+                      >
+                        Copy Link
+                      </button>
                     </td>
                   </tr>
                 ))}
@@ -242,7 +327,10 @@ export default function DashboardPage() {
           <div className="bg-gradient-to-br from-indigo-500 to-purple-600 rounded-xl shadow-sm p-6 text-white">
             <h3 className="text-lg font-semibold mb-2">Create Payment Link</h3>
             <p className="text-indigo-100 text-sm mb-4">Generate a payment link for your customers</p>
-            <button className="bg-white text-indigo-600 px-4 py-2 rounded-lg font-medium hover:bg-indigo-50 transition-colors">
+            <button 
+              onClick={() => setShowCreateModal(true)}
+              className="bg-white text-indigo-600 px-4 py-2 rounded-lg font-medium hover:bg-indigo-50 transition-colors"
+            >
               Create Now
             </button>
           </div>
@@ -264,6 +352,130 @@ export default function DashboardPage() {
           </div>
         </div>
       </main>
+
+      {/* Create Payment Modal */}
+      {showCreateModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-xl shadow-xl max-w-md w-full mx-4">
+            <div className="flex justify-between items-center px- py-4 border-b border-gray-200">
+              <h2 className="text-lg font-semibold text-gray-900">Create Payment Link</h2>
+              <button
+                onClick={() => {
+                  setShowCreateModal(false);
+                  setCreatedPaymentLink(null);
+                  setError(null);
+                }}
+                className="text-gray-400 hover:text-gray-600"
+              >
+                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
+
+            {createdPaymentLink ? (
+              <div className="p-6">
+                <div className="bg-green-50 border border-green-200 rounded-lg p-4 mb-4">
+                  <div className="flex items-center">
+                    <svg className="w-6 h-6 text-green-600 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                    </svg>
+                    <span className="text-green-800 font-medium">Payment link created!</span>
+                  </div>
+                </div>
+                <div className="mb-4">
+                  <label className="block text-sm font-medium text-gray-900 mb-2">Payment Link</label>
+                  <div className="flex">
+                    <input
+                      type="text"
+                      value={createdPaymentLink}
+                      readOnly
+                      className="flex-1 px-3 py-2 border border-gray-300 rounded-l-lg bg-gray-50 text-sm text-gray-900"
+                    />
+                    <button
+                      onClick={copyPaymentLink}
+                      className="px-4 py-2 bg-indigo-600 text-white rounded-r-lg hover:bg-indigo-700 transition-colors"
+                    >
+                      Copy
+                    </button>
+                  </div>
+                </div>
+                <button
+                  onClick={() => {
+                    setShowCreateModal(false);
+                    setCreatedPaymentLink(null);
+                  }}
+                  className="w-full bg-gray-100 text-gray-700 py-2 rounded-lg hover:bg-gray-200 transition-colors"
+                >
+                  Close
+                </button>
+              </div>
+            ) : (
+              <form onSubmit={handleCreatePayment} className="p-6">
+                {error && (
+                  <div className="bg-red-50 border border-red-200 rounded-lg p-3 mb-4">
+                    <p className="text-red-800 text-sm">{error}</p>
+                  </div>
+                )}
+                
+                <div className="mb-4">
+                  <label className="block text-sm font-medium text-gray-900 mb-2">Amount</label>
+                  <input
+                    type="number"
+                    step="0.01"
+                    min="0.01"
+                    required
+                    value={paymentForm.amount}
+                    onChange={(e) => setPaymentForm({ ...paymentForm, amount: e.target.value })}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 text-gray-900"
+                    placeholder="0.00"
+                  />
+                </div>
+
+                <div className="mb-4">
+                  <label className="block text-sm font-medium text-gray-900 mb-2">Asset</label>
+                  <select
+                    value={paymentForm.asset}
+                    onChange={(e) => setPaymentForm({ ...paymentForm, asset: e.target.value })}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 text-gray-900"
+                  >
+                    <option value="USDC">USDC</option>
+                    <option value="XLM">XLM</option>
+                  </select>
+                </div>
+
+                <div className="mb-6">
+                  <label className="block text-sm font-medium text-gray-900 mb-2">Description (Optional)</label>
+                  <textarea
+                    value={paymentForm.description}
+                    onChange={(e) => setPaymentForm({ ...paymentForm, description: e.target.value })}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 text-gray-900"
+                    rows={3}
+                    placeholder="Payment description..."
+                  />
+                </div>
+
+                <div className="flex gap-3">
+                  <button
+                    type="button"
+                    onClick={() => setShowCreateModal(false)}
+                    className="flex-1 bg-gray-100 text-gray-700 py-2 rounded-lg hover:bg-gray-200 transition-colors"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    type="submit"
+                    disabled={creatingPayment}
+                    className="flex-1 bg-indigo-600 text-white py-2 rounded-lg hover:bg-indigo-700 transition-colors disabled:bg-gray-400 disabled:cursor-not-allowed"
+                  >
+                    {creatingPayment ? 'Creating...' : 'Create Link'}
+                  </button>
+                </div>
+              </form>
+            )}
+          </div>
+        </div>
+      )}
     </div>
   );
 }
