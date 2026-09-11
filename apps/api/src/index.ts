@@ -9,6 +9,7 @@ import authPlugin from './plugins/auth.plugin';
 import { authRoutes } from './routes/auth.routes';
 import { paymentIntentsRoutes } from './routes/payment-intents.routes';
 import { invoiceRoutes } from './routes/invoices.routes';
+import { apiKeyRoutes } from './routes/api-keys.routes';
 import { paymentMonitor } from './services/payment-monitor.service';
 import { processPendingWebhooks } from './services/webhook.service';
 
@@ -125,6 +126,7 @@ async function start() {
     await fastify.register(authRoutes, { prefix: '/api/v1/auth' });
     await fastify.register(paymentIntentsRoutes, { prefix: '/api/v1/payment-intents' });
     await fastify.register(invoiceRoutes, { prefix: '/api/v1/invoices' });
+    await fastify.register(apiKeyRoutes, { prefix: '/api/v1/api-keys' });
 
     // Start background services
     if (process.env.NODE_ENV !== 'test') {
