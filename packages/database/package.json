@@ -5,9 +5,9 @@
   "scripts": {
     "build": "tsc",
     "db:generate": "drizzle-kit generate:pg",
-    "db:migrate": "drizzle-kit push",
+    "db:migrate": "drizzle-kit push:pg",
     "db:studio": "drizzle-kit studio",
-    "db:push": "drizzle-kit push"
+    "db:push": "drizzle-kit push:pg"
   },
   "dependencies": {
     "@payflow/types": "workspace:*",
