@@ -1,4 +1,7 @@
 import { FastifyPluginAsync } from 'fastify';
+import bcrypt from 'bcryptjs';
+import { getDatabase, apiKeys, merchants } from '@payflow/database';
+import { eq, and } from 'drizzle-orm';
 
 const authPlugin: FastifyPluginAsync = async (fastify) => {
   // JWT authentication decorator
@@ -27,23 +30,78 @@ const authPlugin: FastifyPluginAsync = async (fastify) => {
 
     const apiKey = authHeader.substring(7);
 
-    // For MVP, we'll implement simple API key validation
-    // In production, this would verify against the database
-    if (!apiKey || apiKey.length < 10) {
+    // Validate API key format
+    if (!apiKey || !apiKey.startsWith('pk_') || apiKey.length < 20) {
       return reply.status(401).send({
         error: 'Invalid API key',
-        message: 'API key is invalid',
+        message: 'API key format is invalid',
       });
     }
 
-    // TODO: Implement proper API key validation against database
-    // For now, we'll trust the JWT auth if it passed
-    if (!request.user) {
+    // Verify API key against database
+    const db = getDatabase();
+    
+    // Get all active API keys and check if any match
+    const allApiKeys = await db
+      .select({
+        id: apiKeys.id,
+        keyHash: apiKeys.keyHash,
+        merchantId: apiKeys.merchantId,
+        isActive: apiKeys.isActive,
+        expiresAt: apiKeys.expiresAt,
+      })
+      .from(apiKeys)
+      .where(eq(apiKeys.isActive, true));
+
+    let validApiKey = null;
+    for (const keyRecord of allApiKeys) {
+      const isValid = await bcrypt.compare(apiKey, keyRecord.keyHash);
+      if (isValid) {
+        // Check if key is expired
+        if (keyRecord.expiresAt && new Date(keyRecord.expiresAt) < new Date()) {
+          return reply.status(401).send({
+            error: 'API key expired',
+            message: 'API key has expired',
+          });
+        }
+        validApiKey = keyRecord;
+        break;
+      }
+    }
+
+    if (!validApiKey) {
       return reply.status(401).send({
-        error: 'Unauthorized',
-        message: 'Valid authentication required',
+        error: 'Invalid API key',
+        message: 'API key is invalid or inactive',
       });
     }
+
+    // Update last used timestamp
+    await db
+      .update(apiKeys)
+      .set({ lastUsedAt: new Date() })
+      .where(eq(apiKeys.id, validApiKey.id));
+
+    // Get merchant details
+    const merchantResult = await db
+      .select()
+      .from(merchants)
+      .where(eq(merchants.id, validApiKey.merchantId))
+      .limit(1);
+
+    if (merchantResult.length === 0) {
+      return reply.status(401).send({
+        error: 'Merchant not found',
+        message: 'Associated merchant not found',
+      });
+    }
+
+    // Set user context from API key
+    request.user = {
+      userId: merchantResult[0].userId,
+      merchantId: validApiKey.merchantId,
+      authenticatedVia: 'api_key',
+    };
   });
 };
 
