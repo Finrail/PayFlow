@@ -14,10 +14,9 @@ import {
 // Stellar Testnet configuration
 const NETWORK_PASSPHRASE = Networks.TESTNET;
 const HORIZON_URL = 'https://horizon-testnet.stellar.org';
-const RPC_URL = 'https://soroban-testnet.stellar.org';
 
 // Contract deployment details
-const CONTRACT_ID = 'CBOPC7Z64MXDAQKHFM2TQYVCPG7BJY7VX6FQDWQENTOFJBL3AJEBKO7C';
+// const CONTRACT_ID = 'CBOPC7Z64MXDAQKHFM2TQYVCPG7BJY7VX6FQDWQENTOFJBL3AJEBKO7C';
 
 // USDC on Testnet
 const USDC_ISSUER = 'GBBD47IFQFJLVQAMZEDS2N7TU7VA7K7XXQDGFO2UPHTM4JUW7RZMOBKE';
