@@ -21,7 +21,7 @@ interface PaymentIntent {
   asset: string;
   recipient: string;
   status: 'CREATED' | 'PENDING' | 'CONFIRMED' | 'FAILED' | 'EXPIRED';
-  metadata?: Record<string, any>;
+  metadata?: Record<string, unknown>;
   expiresAt?: string;
   transactionHash?: string;
   createdAt: string;
@@ -39,22 +39,6 @@ export default function PaymentPage() {
   const [paying, setPaying] = useState(false);
   const [paymentError, setPaymentError] = useState<string | null>(null);
   const [balance, setBalance] = useState<{ asset: string; balance: string }[]>([]);
-
-  useEffect(() => {
-    fetchPaymentIntent();
-  }, [paymentIntentId]);
-
-  useEffect(() => {
-    if (payment) {
-      generateQRCode();
-    }
-  }, [payment]);
-
-  useEffect(() => {
-    if (wallet.isConnected) {
-      fetchBalance();
-    }
-  }, [wallet]);
 
   const fetchPaymentIntent = async () => {
     try {
@@ -104,6 +88,22 @@ export default function PaymentPage() {
       console.error('Failed to fetch balance:', err);
     }
   };
+
+  useEffect(() => {
+    fetchPaymentIntent();
+  }, [paymentIntentId]);
+
+  useEffect(() => {
+    if (payment) {
+      generateQRCode();
+    }
+  }, [payment]);
+
+  useEffect(() => {
+    if (wallet.isConnected) {
+      fetchBalance();
+    }
+  }, [wallet]);
 
   const handleConnectWallet = async () => {
     const installed = await isFreighterInstalled();
