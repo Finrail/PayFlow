@@ -4,7 +4,6 @@ import { build } from '../index';
 describe('Payment Intents Routes', () => {
   let app: any;
   let token: string;
-  let merchantId: string;
 
   beforeAll(async () => {
     app = await build();
@@ -31,7 +30,6 @@ describe('Payment Intents Routes', () => {
     });
 
     token = loginResponse.json().token;
-    merchantId = loginResponse.json().merchant.id;
   });
 
   afterAll(async () => {
