@@ -1,16 +1,12 @@
 import { describe, it, expect, beforeAll, afterAll } from 'vitest';
 import { build } from '../index';
-import { getDatabase } from '@payflow/database';
 
 describe('Payment Intents Routes', () => {
   let app: any;
-  let db: any;
   let token: string;
-  let merchantId: string;
 
   beforeAll(async () => {
     app = await build();
-    db = getDatabase();
 
     // Register and login
     await app.inject({
