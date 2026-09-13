@@ -4,11 +4,9 @@ import { getDatabase } from '@payflow/database';
 
 describe('Authentication Routes', () => {
   let app: any;
-  let db: any;
 
   beforeAll(async () => {
     app = await build();
-    db = getDatabase();
   });
 
   afterAll(async () => {
