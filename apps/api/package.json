@@ -30,12 +30,11 @@
     "@types/node": "^20.11.0",
     "@types/qrcode": "^1.5.5",
     "@types/uuid": "^9.0.7",
-    "@typescript-eslint/eslint-plugin": "^6.19.0",
-    "@typescript-eslint/parser": "^6.19.0",
-    "eslint": "^8.56.0",
+    "eslint": "^9.0.0",
     "supertest": "^6.3.4",
     "tsx": "^4.7.0",
     "typescript": "^5.3.3",
+    "typescript-eslint": "^8.0.0",
     "vitest": "^1.2.0"
   }
 }
