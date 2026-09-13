@@ -7,7 +7,7 @@
     "build": "echo 'Build skipped - using tsx for runtime'",
     "start": "tsx src/index.ts",
     "test": "vitest",
-    "lint": "eslint src --ext .ts"
+    "lint": "eslint src"
   },
   "dependencies": {
     "@fastify/cors": "^9.0.1",
