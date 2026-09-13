@@ -4,6 +4,7 @@ import { build } from '../index';
 describe('Payment Intents Routes', () => {
   let app: any;
   let token: string;
+  let merchantId: string;
 
   beforeAll(async () => {
     app = await build();
