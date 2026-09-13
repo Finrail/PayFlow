@@ -90,19 +90,25 @@ export default function PaymentPage() {
   }, [wallet.publicKey]);
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     fetchPaymentIntent();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [fetchPaymentIntent]);
 
   useEffect(() => {
     if (payment) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       generateQRCode();
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [payment, generateQRCode]);
 
   useEffect(() => {
     if (wallet.isConnected) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       fetchBalance();
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [wallet.isConnected, fetchBalance]);
 
   const handleConnectWallet = async () => {

@@ -240,10 +240,10 @@ export async function fundAccountWithFriendbot(publicKey: string): Promise<boole
 /**
  * Get transaction details
  */
-export async function getTransaction(transactionHash: string): Promise<Horizon.ServerApi.TransactionRecord | null> {
+export async function getTransaction(transactionHash: string): Promise<unknown> {
   try {
     const server = new Horizon.Server(HORIZON_URL);
-    const transaction = await server.transactions().transaction(transactionHash);
+    const transaction = await server.transactions().transaction(transactionHash).call();
     return transaction;
   } catch (error) {
     console.error('Error loading transaction:', error);
