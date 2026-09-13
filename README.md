@@ -8,7 +8,7 @@ PayFlow makes it easy for businesses to accept Stellar payments without dealing 
 
 ## 🎯 What is PayFlow?
 
-PayFlow is payment infrastructure - not a wallet. Think of it as Stripe for Stellar:
+PayFlow is payment infrastructure - not a wallet.
 
 - **For Merchants**: Accept payments from customers using Stellar
 - **For Developers**: Simple API to integrate Stellar payments
