@@ -4,7 +4,6 @@ import cors from '@fastify/cors';
 import jwt from '@fastify/jwt';
 import rateLimit from '@fastify/rate-limit';
 import env from '@fastify/env';
-import pino from 'pino';
 import authPlugin from './plugins/auth.plugin';
 import { authRoutes } from './routes/auth.routes';
 import { paymentIntentsRoutes } from './routes/payment-intents.routes';

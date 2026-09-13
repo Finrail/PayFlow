@@ -1,7 +1,7 @@
 import { FastifyPluginAsync } from 'fastify';
 import bcrypt from 'bcryptjs';
 import { getDatabase, apiKeys, merchants } from '@payflow/database';
-import { eq, and } from 'drizzle-orm';
+import { eq } from 'drizzle-orm';
 
 const authPlugin: FastifyPluginAsync = async (fastify) => {
   // JWT authentication decorator

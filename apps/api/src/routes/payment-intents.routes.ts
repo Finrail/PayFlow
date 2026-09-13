@@ -1,6 +1,6 @@
 import { FastifyInstance } from 'fastify';
 import { v4 as uuidv4 } from 'uuid';
-import { getDatabase, paymentIntents, merchants } from '@payflow/database';
+import { getDatabase, paymentIntents } from '@payflow/database';
 import { eq, and } from 'drizzle-orm';
 import { validateStellarAddress, validateAsset } from '@payflow/stellar';
 import type { CreatePaymentIntentRequest } from '@payflow/types';

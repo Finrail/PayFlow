@@ -1,5 +1,5 @@
 import { getDatabase, paymentIntents } from '@payflow/database';
-import { eq, and, lt } from 'drizzle-orm';
+import { eq } from 'drizzle-orm';
 import { verifyAndConfirmPayment, checkPaymentExpiration } from './payment-verification.service';
 import { deliverWebhook } from './webhook.service';
 import type { WebhookPayload } from '@payflow/types';

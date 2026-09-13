@@ -1,8 +1,6 @@
 import { describe, it, expect, beforeAll, afterAll } from 'vitest';
 import { build } from '../index';
 import { getDatabase } from '@payflow/database';
-import { merchants, users } from '@payflow/database/schema';
-import { eq } from 'drizzle-orm';
 
 describe('Authentication Routes', () => {
   let app: any;
