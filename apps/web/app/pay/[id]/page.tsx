@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { useParams } from 'next/navigation';
 import Link from 'next/link';
 import QRCode from 'qrcode';
@@ -40,7 +40,7 @@ export default function PaymentPage() {
   const [paymentError, setPaymentError] = useState<string | null>(null);
   const [balance, setBalance] = useState<{ asset: string; balance: string }[]>([]);
 
-  const fetchPaymentIntent = async () => {
+  const fetchPaymentIntent = useCallback(async () => {
     try {
       // Simulate API call for MVP demo
       await new Promise(resolve => setTimeout(resolve, 500));
@@ -64,9 +64,9 @@ export default function PaymentPage() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [paymentIntentId]);
 
-  const generateQRCode = async () => {
+  const generateQRCode = useCallback(async () => {
     if (!payment) return;
     
     const paymentUrl = `${window.location.origin}/pay/${paymentIntentId}`;
@@ -76,9 +76,9 @@ export default function PaymentPage() {
     } catch (err) {
       console.error('Failed to generate QR code:', err);
     }
-  };
+  }, [payment, paymentIntentId]);
 
-  const fetchBalance = async () => {
+  const fetchBalance = useCallback(async () => {
     if (!wallet.publicKey) return;
     
     try {
@@ -87,23 +87,23 @@ export default function PaymentPage() {
     } catch (err) {
       console.error('Failed to fetch balance:', err);
     }
-  };
+  }, [wallet.publicKey]);
 
   useEffect(() => {
     fetchPaymentIntent();
-  }, [paymentIntentId]);
+  }, [fetchPaymentIntent]);
 
   useEffect(() => {
     if (payment) {
       generateQRCode();
     }
-  }, [payment]);
+  }, [payment, generateQRCode]);
 
   useEffect(() => {
     if (wallet.isConnected) {
       fetchBalance();
     }
-  }, [wallet]);
+  }, [wallet.isConnected, fetchBalance]);
 
   const handleConnectWallet = async () => {
     const installed = await isFreighterInstalled();

@@ -39,10 +39,6 @@ export default function DashboardPage() {
   const [createdPaymentLink, setCreatedPaymentLink] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
-    fetchDashboardData();
-  }, []);
-
   const fetchDashboardData = async () => {
     try {
       // In a real app, these would be authenticated API calls
@@ -100,6 +96,10 @@ export default function DashboardPage() {
       setLoading(false);
     }
   };
+
+  useEffect(() => {
+    fetchDashboardData();
+  }, []);
 
   const getStatusColor = (status: string) => {
     switch (status) {
