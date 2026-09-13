@@ -170,4 +170,45 @@ async function start() {
   }
 }
 
-start();
+// Build function for testing
+export async function build() {
+  const testFastify = Fastify({
+    logger: false,
+  });
+
+  await testFastify.register(env, options);
+
+  await testFastify.register(cors, {
+    origin: true,
+    credentials: true,
+  });
+
+  await testFastify.register(jwt, {
+    secret: testFastify.config.JWT_SECRET || 'test-secret',
+  });
+
+  await testFastify.register(authPlugin);
+
+  // Register routes
+  await testFastify.register(authRoutes, { prefix: '/api/v1/auth' });
+  await testFastify.register(paymentIntentsRoutes, { prefix: '/api/v1/payment-intents' });
+  await testFastify.register(invoiceRoutes, { prefix: '/api/v1/invoices' });
+  await testFastify.register(apiKeyRoutes, { prefix: '/api/v1/api-keys' });
+
+  // Health check endpoints
+  testFastify.get('/health', async () => ({
+    status: 'ok',
+    timestamp: new Date().toISOString(),
+  }));
+
+  testFastify.get('/ready', async () => ({
+    status: 'ready',
+    timestamp: new Date().toISOString(),
+  }));
+
+  return testFastify;
+}
+
+if (process.env.NODE_ENV !== 'test') {
+  start();
+}
