@@ -208,9 +208,15 @@ importers:
 
   packages/types:
     devDependencies:
+      eslint:
+        specifier: ^9.0.0
+        version: 9.39.5
       typescript:
         specifier: ^5.3.3
         version: 5.9.3
+      typescript-eslint:
+        specifier: ^8.0.0
+        version: 8.69.0(eslint@9.39.5)(typescript@5.9.3)
 
 packages:
 

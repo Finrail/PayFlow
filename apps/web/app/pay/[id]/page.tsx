@@ -92,7 +92,6 @@ export default function PaymentPage() {
   useEffect(() => {
     // eslint-disable-next-line react-hooks/set-state-in-effect
     fetchPaymentIntent();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [fetchPaymentIntent]);
 
   useEffect(() => {
@@ -100,7 +99,6 @@ export default function PaymentPage() {
       // eslint-disable-next-line react-hooks/set-state-in-effect
       generateQRCode();
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [payment, generateQRCode]);
 
   useEffect(() => {
@@ -108,7 +106,6 @@ export default function PaymentPage() {
       // eslint-disable-next-line react-hooks/set-state-in-effect
       fetchBalance();
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [wallet.isConnected, fetchBalance]);
 
   const handleConnectWallet = async () => {
