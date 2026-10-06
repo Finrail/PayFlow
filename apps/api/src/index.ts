@@ -1,4 +1,3 @@
-import 'dotenv/config';
 import Fastify from 'fastify';
 import cors from '@fastify/cors';
 import jwt from '@fastify/jwt';
@@ -11,6 +10,12 @@ import { invoiceRoutes } from './routes/invoices.routes';
 import { apiKeyRoutes } from './routes/api-keys.routes';
 import { paymentMonitor } from './services/payment-monitor.service';
 import { processPendingWebhooks } from './services/webhook.service';
+
+declare module 'fastify' {
+  interface FastifyInstance {
+    config: Record<string, string>;
+  }
+}
 
 const fastify = Fastify({
   logger: {

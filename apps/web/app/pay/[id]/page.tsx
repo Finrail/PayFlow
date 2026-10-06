@@ -41,29 +41,18 @@ export default function PaymentPage() {
   const [balance, setBalance] = useState<{ asset: string; balance: string }[]>([]);
 
   const fetchPaymentIntent = useCallback(async () => {
-    try {
-      // Simulate API call for MVP demo
-      await new Promise(resolve => setTimeout(resolve, 500));
-      
-      // Generate mock payment data based on the payment ID
-      const mockPayment: PaymentIntent = {
-        id: paymentIntentId,
-        merchantId: 'merchant_123',
-        amount: '50.00',
-        asset: 'USDC',
-        recipient: 'GBBD47IFQFJLVQAMZEDS2N7TU7VA7K7XXQDGFO2UPHTM4JUW7RZMOBKE',
-        status: 'CREATED',
-        metadata: { description: 'Demo payment' },
-        createdAt: new Date().toISOString(),
-        expiresAt: new Date(Date.now() + 30 * 60 * 1000).toISOString(), // 30 minutes from now
-      };
-      
-      setPayment(mockPayment);
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to load payment');
-    } finally {
-      setLoading(false);
+    const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001/api/v1';
+    const response = await fetch(
+      `${apiUrl}/payment-intents/checkout/${encodeURIComponent(paymentIntentId)}`,
+      { cache: 'no-store' }
+    );
+
+    if (!response.ok) {
+      const result = await response.json().catch(() => null);
+      throw new Error(result?.message || result?.error || 'Failed to load payment');
     }
+
+    setPayment(await response.json());
   }, [paymentIntentId]);
 
   const generateQRCode = useCallback(async () => {
@@ -90,9 +79,31 @@ export default function PaymentPage() {
   }, [wallet.publicKey]);
 
   useEffect(() => {
+    let active = true;
+    // This effect synchronizes checkout state with the payment API.
     // eslint-disable-next-line react-hooks/set-state-in-effect
-    fetchPaymentIntent();
+    fetchPaymentIntent()
+      .catch((err) => {
+        if (active) setError(err instanceof Error ? err.message : 'Failed to load payment');
+      })
+      .finally(() => {
+        if (active) setLoading(false);
+      });
+
+    return () => {
+      active = false;
+    };
   }, [fetchPaymentIntent]);
+
+  useEffect(() => {
+    if (payment?.status !== 'PENDING') return;
+
+    const interval = window.setInterval(() => {
+      fetchPaymentIntent().catch((err) => console.error('Failed to refresh payment status:', err));
+    }, 5000);
+
+    return () => window.clearInterval(interval);
+  }, [payment?.status, fetchPaymentIntent]);
 
   useEffect(() => {
     if (payment) {
@@ -146,10 +157,27 @@ export default function PaymentPage() {
       );
 
       if (result.success) {
-        // Update payment with transaction hash
-        setPayment((prev) => prev ? { ...prev, transactionHash: result.transactionHash, status: 'PENDING' } : null);
-        // Poll for payment confirmation
-        pollPaymentStatus();
+        const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001/api/v1';
+        const response = await fetch(
+          `${apiUrl}/payment-intents/checkout/${encodeURIComponent(paymentIntentId)}/submit`,
+          {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ transactionHash: result.transactionHash }),
+          }
+        );
+
+        const submission = await response.json().catch(() => null);
+        if (!response.ok) {
+          throw new Error(submission?.message || submission?.error || 'Could not submit transaction for verification');
+        }
+
+        setPayment((prev) => prev ? {
+          ...prev,
+          transactionHash: result.transactionHash,
+          status: submission.status,
+        } : null);
+        setPaying(false);
       } else {
         setPaymentError(result.error || 'Payment failed');
         setPaying(false);
@@ -159,14 +187,6 @@ export default function PaymentPage() {
       setPaymentError(err instanceof Error ? err.message : 'Payment failed');
       setPaying(false);
     }
-  };
-
-  const pollPaymentStatus = async () => {
-    // Simulate payment confirmation for MVP demo
-    setTimeout(() => {
-      setPayment((prev) => prev ? { ...prev, status: 'CONFIRMED' } : null);
-      setPaying(false);
-    }, 3000);
   };
 
   if (loading) {

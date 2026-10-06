@@ -22,10 +22,19 @@ export async function authRoutes(fastify: FastifyInstance) {
     const { email, password, name, businessName } = request.body;
 
     // Validate input
-    if (!email || !password || !name) {
+    if (typeof email !== 'string' || typeof password !== 'string' || typeof name !== 'string'
+      || !email.trim() || !password || !name.trim()) {
       return reply.status(400).send({
         error: 'Missing required fields',
         message: 'email, password, and name are required',
+      });
+    }
+
+    const normalizedEmail = email.trim().toLowerCase();
+    if (normalizedEmail.length > 254 || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(normalizedEmail)) {
+      return reply.status(400).send({
+        error: 'Invalid email',
+        message: 'Enter a valid email address',
       });
     }
 
@@ -39,7 +48,7 @@ export async function authRoutes(fastify: FastifyInstance) {
     const db = getDatabase();
 
     // Check if user already exists
-    const existingUser = await db.select().from(users).where(eq(users.email, email)).limit(1);
+    const existingUser = await db.select().from(users).where(eq(users.email, normalizedEmail)).limit(1);
     if (existingUser.length > 0) {
       return reply.status(409).send({
         error: 'User already exists',
@@ -54,7 +63,7 @@ export async function authRoutes(fastify: FastifyInstance) {
     const userId = uuidv4();
     await db.insert(users).values({
       id: userId,
-      email,
+      email: normalizedEmail,
       passwordHash,
     });
 
@@ -75,7 +84,7 @@ export async function authRoutes(fastify: FastifyInstance) {
       token,
       user: {
         id: userId,
-        email,
+        email: normalizedEmail,
         name,
         businessName,
       },
@@ -86,17 +95,19 @@ export async function authRoutes(fastify: FastifyInstance) {
   fastify.post<{ Body: LoginBody }>('/login', async (request, reply) => {
     const { email, password } = request.body;
 
-    if (!email || !password) {
+    if (typeof email !== 'string' || typeof password !== 'string' || !email.trim() || !password) {
       return reply.status(400).send({
         error: 'Missing required fields',
         message: 'email and password are required',
       });
     }
 
+    const normalizedEmail = email.trim().toLowerCase();
+
     const db = getDatabase();
 
     // Find user
-    const userResult = await db.select().from(users).where(eq(users.email, email)).limit(1);
+    const userResult = await db.select().from(users).where(eq(users.email, normalizedEmail)).limit(1);
     if (userResult.length === 0) {
       return reply.status(401).send({
         error: 'Invalid credentials',
@@ -142,7 +153,7 @@ export async function authRoutes(fastify: FastifyInstance) {
   });
 
   // Verify token
-  fastify.get('/verify', async (request, reply) => {
+  const getCurrentUser = async (request: any, reply: any) => {
     try {
       await (fastify as any).authenticate(request, reply);
     } catch (err) {
@@ -169,5 +180,8 @@ export async function authRoutes(fastify: FastifyInstance) {
       email: userResult[0].email,
       name: merchantResult[0].name,
     });
-  });
+  };
+
+  fastify.get('/verify', getCurrentUser);
+  fastify.get('/me', getCurrentUser);
 }

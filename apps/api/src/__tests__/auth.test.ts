@@ -26,9 +26,10 @@ describe('Authentication Routes', () => {
       });
 
       expect(response.statusCode).toBe(201);
-      expect(response.json).toHaveProperty('id');
-      expect(response.json).toHaveProperty('email', 'test@example.com');
-      expect(response.json).not.toHaveProperty('password');
+      expect(response.json().user).toHaveProperty('id');
+      expect(response.json().user).toHaveProperty('email', 'test@example.com');
+      expect(response.json()).not.toHaveProperty('password');
+      expect(response.json()).not.toHaveProperty('passwordHash');
     });
 
     it('should fail with invalid email', async () => {
@@ -108,8 +109,8 @@ describe('Authentication Routes', () => {
       });
 
       expect(response.statusCode).toBe(200);
-      expect(response.json).toHaveProperty('token');
-      expect(response.json).toHaveProperty('merchant');
+      expect(response.json()).toHaveProperty('token');
+      expect(response.json()).toHaveProperty('user');
     });
 
     it('should fail with invalid credentials', async () => {
@@ -176,7 +177,7 @@ describe('Authentication Routes', () => {
       });
 
       expect(response.statusCode).toBe(200);
-      expect(response.json).toHaveProperty('email', 'me-test@example.com');
+      expect(response.json()).toHaveProperty('email', 'me-test@example.com');
     });
 
     it('should fail without token', async () => {

@@ -48,7 +48,7 @@ describe('Payment Intents Routes', () => {
         payload: {
           amount: '50',
           asset: 'USDC',
-          recipient: 'GTEST1234567890123456789012345678901234567890123456789012345678',
+          recipient: 'GBBD47IFQFJLVQAMZEDS2N7TU7VA7K7XXQDGFO2UPHTM4JUW7RZMOBKE',
           metadata: {
             order_id: '12345',
           },
@@ -56,10 +56,10 @@ describe('Payment Intents Routes', () => {
       });
 
       expect(response.statusCode).toBe(201);
-      expect(response.json).toHaveProperty('id');
-      expect(response.json).toHaveProperty('amount', '50');
-      expect(response.json).toHaveProperty('asset', 'USDC');
-      expect(response.json).toHaveProperty('status', 'CREATED');
+      expect(response.json()).toHaveProperty('id');
+      expect(response.json()).toHaveProperty('amount', '50');
+      expect(response.json()).toHaveProperty('asset', 'USDC');
+      expect(response.json()).toHaveProperty('status', 'CREATED');
     });
 
     it('should fail without authentication', async () => {
@@ -69,7 +69,7 @@ describe('Payment Intents Routes', () => {
         payload: {
           amount: '50',
           asset: 'USDC',
-          recipient: 'GTEST1234567890123456789012345678901234567890123456789012345678',
+          recipient: 'GBBD47IFQFJLVQAMZEDS2N7TU7VA7K7XXQDGFO2UPHTM4JUW7RZMOBKE',
         },
       });
 
@@ -86,7 +86,7 @@ describe('Payment Intents Routes', () => {
         payload: {
           amount: '-50',
           asset: 'USDC',
-          recipient: 'GTEST1234567890123456789012345678901234567890123456789012345678',
+          recipient: 'GBBD47IFQFJLVQAMZEDS2N7TU7VA7K7XXQDGFO2UPHTM4JUW7RZMOBKE',
         },
       });
 
@@ -114,7 +114,7 @@ describe('Payment Intents Routes', () => {
       const payload = {
         amount: '50',
         asset: 'USDC',
-        recipient: 'GTEST1234567890123456789012345678901234567890123456789012345678',
+        recipient: 'GBBD47IFQFJLVQAMZEDS2N7TU7VA7K7XXQDGFO2UPHTM4JUW7RZMOBKE',
       };
 
       const response1 = await app.inject({
@@ -137,7 +137,7 @@ describe('Payment Intents Routes', () => {
         payload,
       });
 
-      expect(response1.json.id).toBe(response2.json.id);
+      expect(response1.json().id).toBe(response2.json().id);
     });
   });
 
@@ -155,11 +155,11 @@ describe('Payment Intents Routes', () => {
         payload: {
           amount: '50',
           asset: 'USDC',
-          recipient: 'GTEST1234567890123456789012345678901234567890123456789012345678',
+          recipient: 'GBBD47IFQFJLVQAMZEDS2N7TU7VA7K7XXQDGFO2UPHTM4JUW7RZMOBKE',
         },
       });
 
-      paymentIntentId = response.json.id;
+      paymentIntentId = response.json().id;
     });
 
     it('should get a payment intent by ID', async () => {
@@ -172,7 +172,7 @@ describe('Payment Intents Routes', () => {
       });
 
       expect(response.statusCode).toBe(200);
-      expect(response.json).toHaveProperty('id', paymentIntentId);
+      expect(response.json()).toHaveProperty('id', paymentIntentId);
     });
 
     it('should fail without authentication', async () => {
@@ -211,7 +211,7 @@ describe('Payment Intents Routes', () => {
           payload: {
             amount: (50 + i).toString(),
             asset: 'USDC',
-            recipient: 'GTEST1234567890123456789012345678901234567890123456789012345678',
+            recipient: 'GBBD47IFQFJLVQAMZEDS2N7TU7VA7K7XXQDGFO2UPHTM4JUW7RZMOBKE',
           },
         });
       }
@@ -227,8 +227,8 @@ describe('Payment Intents Routes', () => {
       });
 
       expect(response.statusCode).toBe(200);
-      expect(Array.isArray(response.json)).toBe(true);
-      expect(response.json.length).toBeGreaterThanOrEqual(5);
+      expect(Array.isArray(response.json())).toBe(true);
+      expect(response.json().length).toBeGreaterThanOrEqual(5);
     });
 
     it('should respect limit parameter', async () => {
@@ -241,7 +241,7 @@ describe('Payment Intents Routes', () => {
       });
 
       expect(response.statusCode).toBe(200);
-      expect(response.json.length).toBeLessThanOrEqual(3);
+      expect(response.json().length).toBeLessThanOrEqual(3);
     });
 
     it('should respect offset parameter', async () => {
@@ -261,7 +261,7 @@ describe('Payment Intents Routes', () => {
         },
       });
 
-      expect(response1.json[0].id).not.toBe(response2.json[0].id);
+      expect(response1.json()[0].id).not.toBe(response2.json()[0].id);
     });
 
     it('should filter by status', async () => {
@@ -274,7 +274,7 @@ describe('Payment Intents Routes', () => {
       });
 
       expect(response.statusCode).toBe(200);
-      response.json.forEach((intent: any) => {
+      response.json().forEach((intent: any) => {
         expect(intent.status).toBe('CREATED');
       });
     });
