@@ -8,7 +8,6 @@ export async function invoiceRoutes(fastify: FastifyInstance) {
   // Create invoice
   fastify.post<{ Body: CreateInvoiceRequest }>('/', async (request, reply) => {
     try {
-      await (fastify as any).authenticate(request, reply);
       await (fastify as any).apiKeyAuth(request, reply);
     } catch (err) {
       return reply.send(err);
@@ -74,7 +73,6 @@ export async function invoiceRoutes(fastify: FastifyInstance) {
   // Get invoice by ID
   fastify.get('/:id', async (request, reply) => {
     try {
-      await (fastify as any).authenticate(request, reply);
       await (fastify as any).apiKeyAuth(request, reply);
     } catch (err) {
       return reply.send(err);
@@ -105,7 +103,6 @@ export async function invoiceRoutes(fastify: FastifyInstance) {
   // List invoices
   fastify.get('/', async (request, reply) => {
     try {
-      await (fastify as any).authenticate(request, reply);
       await (fastify as any).apiKeyAuth(request, reply);
     } catch (err) {
       return reply.send(err);
@@ -115,18 +112,16 @@ export async function invoiceRoutes(fastify: FastifyInstance) {
 
     const db = getDatabase();
 
-    let query = db.select()
-      .from(invoices)
-      .where(eq(invoices.merchantId, merchantId));
-
+    const filters = [eq(invoices.merchantId, merchantId)];
     if (status) {
-      query = query.where(and(
-        eq(invoices.merchantId, merchantId),
-        eq(invoices.status, status)
-      )) as any;
+      filters.push(eq(invoices.status, status));
     }
 
-    const results = await query.limit(limit).offset(offset);
+    const results = await db.select()
+      .from(invoices)
+      .where(and(...filters))
+      .limit(limit)
+      .offset(offset);
 
     return reply.send(results);
   });
@@ -134,7 +129,6 @@ export async function invoiceRoutes(fastify: FastifyInstance) {
   // Update invoice
   fastify.patch<{ Body: Partial<CreateInvoiceRequest> }>('/:id', async (request, reply) => {
     try {
-      await (fastify as any).authenticate(request, reply);
       await (fastify as any).apiKeyAuth(request, reply);
     } catch (err) {
       return reply.send(err);
@@ -185,7 +179,6 @@ export async function invoiceRoutes(fastify: FastifyInstance) {
   // Send invoice (change status to OPEN)
   fastify.post('/:id/send', async (request, reply) => {
     try {
-      await (fastify as any).authenticate(request, reply);
       await (fastify as any).apiKeyAuth(request, reply);
     } catch (err) {
       return reply.send(err);
@@ -251,7 +244,6 @@ export async function invoiceRoutes(fastify: FastifyInstance) {
   // Cancel invoice
   fastify.post('/:id/cancel', async (request, reply) => {
     try {
-      await (fastify as any).authenticate(request, reply);
       await (fastify as any).apiKeyAuth(request, reply);
     } catch (err) {
       return reply.send(err);

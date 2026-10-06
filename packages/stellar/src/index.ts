@@ -15,13 +15,32 @@ const SUPPORTED_ASSETS = [
   { code: 'XLM', issuer: null }, // Native XLM
 ];
 
+const STROOPS_PER_UNIT = 10_000_000n;
+const MAX_STROOPS = 9_223_372_036_854_775_807n;
+
+function toStroops(amount: string): bigint | null {
+  const match = /^(\d+)(?:\.(\d{1,7}))?$/.exec(amount);
+  if (!match) {
+    return null;
+  }
+
+  const stroops = BigInt(match[1]) * STROOPS_PER_UNIT
+    + BigInt((match[2] || '').padEnd(7, '0'));
+
+  return stroops <= MAX_STROOPS ? stroops : null;
+}
+
+export function validatePaymentAmount(amount: string): boolean {
+  const stroops = toStroops(amount);
+  return stroops !== null && stroops > 0n;
+}
+
 /**
  * Validate a Stellar address
  */
 export function validateStellarAddress(address: string): boolean {
   try {
-    StellarSdk.StrKey.isValidEd25519PublicKey(address);
-    return true;
+    return StellarSdk.StrKey.isValidEd25519PublicKey(address);
   } catch (error) {
     return false;
   }
@@ -64,62 +83,44 @@ export async function validateTransaction(
   expectedAmount: string,
   expectedAsset: string
 ): Promise<boolean> {
-  try {
-    const server = new StellarSdk.Horizon.Server(STELLAR_HORIZON_URL);
-    const transaction = await server.transactions().transaction(transactionHash).call();
-
-    if (!transaction.successful) {
-      return false;
-    }
-
-    const operations = await transaction.operations();
-    if (!operations || operations.records.length === 0) {
-      return false;
-    }
-
-    const paymentOp = operations.records.find((op: any) => op.type === 'payment');
-    if (!paymentOp) {
-      return false;
-    }
-
-    // Verify recipient
-    if ((paymentOp as any).destination !== expectedRecipient) {
-      return false;
-    }
-
-    // Verify amount
-    const amount = parseFloat((paymentOp as any).amount);
-    if (amount !== parseFloat(expectedAmount)) {
-      return false;
-    }
-
-    // Verify asset
-    const assetCode = (paymentOp as any).asset_code;
-    const assetIssuer = (paymentOp as any).asset_issuer;
-    const asset = assetCode === 'XLM' ? 'XLM' : `${assetCode}:${assetIssuer}`;
-    if (asset !== expectedAsset) {
-      return false;
-    }
-
-    return true;
-  } catch (error) {
-    console.error('Error validating transaction:', error);
+  const expectedStroops = toStroops(expectedAmount);
+  if (expectedStroops === null || expectedStroops === 0n) {
     return false;
   }
+
+  const server = new StellarSdk.Horizon.Server(STELLAR_HORIZON_URL);
+  const transaction = await server.transactions().transaction(transactionHash).call();
+  if (!transaction.successful) {
+    return false;
+  }
+
+  const operations = await server.operations().forTransaction(transactionHash).call();
+  return operations.records.some((operation: any) => {
+    if (operation.type !== 'payment' || operation.destination !== expectedRecipient) {
+      return false;
+    }
+
+    if (toStroops(operation.amount) !== expectedStroops) {
+      return false;
+    }
+
+    if (expectedAsset === 'XLM') {
+      return operation.asset_type === 'native';
+    }
+
+    const supportedAsset = SUPPORTED_ASSETS.find((asset) => asset.code === expectedAsset);
+    return Boolean(supportedAsset?.issuer)
+      && operation.asset_code === supportedAsset?.code
+      && operation.asset_issuer === supportedAsset?.issuer;
+  });
 }
 
 /**
  * Get transaction details
  */
 export async function getTransactionDetails(transactionHash: string) {
-  try {
-    const server = new StellarSdk.Horizon.Server(STELLAR_HORIZON_URL);
-    const transaction = await server.transactions().transaction(transactionHash);
-    return transaction;
-  } catch (error) {
-    console.error('Error getting transaction details:', error);
-    throw error;
-  }
+  const server = new StellarSdk.Horizon.Server(STELLAR_HORIZON_URL);
+  return server.transactions().transaction(transactionHash).call();
 }
 
 /**

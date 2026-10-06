@@ -22,6 +22,10 @@ export async function verifyAndConfirmPayment(paymentIntentId: string, transacti
     return { status: 'already_confirmed', intent };
   }
 
+  if (intent.status !== 'PENDING' || intent.transactionHash !== transactionHash) {
+    throw new Error('Payment intent is not waiting for this transaction');
+  }
+
   // Verify transaction
   const isValid = await validateTransaction(
     transactionHash,
@@ -37,7 +41,11 @@ export async function verifyAndConfirmPayment(paymentIntentId: string, transacti
         status: 'FAILED',
         updatedAt: new Date()
       })
-      .where(eq(paymentIntents.id, paymentIntentId));
+      .where(and(
+        eq(paymentIntents.id, paymentIntentId),
+        eq(paymentIntents.status, 'PENDING'),
+        eq(paymentIntents.transactionHash, transactionHash)
+      ));
 
     return { status: 'invalid', intent };
   }
@@ -45,28 +53,49 @@ export async function verifyAndConfirmPayment(paymentIntentId: string, transacti
   // Get transaction details
   const txDetails = await getTransactionDetails(transactionHash);
 
-  // Create payment record
-  const paymentId = crypto.randomUUID();
-  await db.insert(payments).values({
-    id: paymentId,
-    paymentIntentId,
-    amount: intent.amount,
-    asset: intent.asset,
-    fromAddress: txDetails.source_account,
-    toAddress: intent.recipient,
-    transactionHash,
-  });
+  return db.transaction(async (tx) => {
+    const [currentIntent] = await tx.select()
+      .from(paymentIntents)
+      .where(eq(paymentIntents.id, paymentIntentId))
+      .for('update');
 
-  // Update payment intent status
-  await db.update(paymentIntents)
-    .set({
-      status: 'CONFIRMED',
+    if (!currentIntent) {
+      throw new Error('Payment intent not found');
+    }
+
+    if (currentIntent.status === 'CONFIRMED') {
+      return { status: 'already_confirmed', intent: currentIntent };
+    }
+
+    if (currentIntent.status !== 'PENDING' || currentIntent.transactionHash !== transactionHash) {
+      throw new Error('Payment intent is no longer waiting for this transaction');
+    }
+
+    await tx.insert(payments).values({
+      id: crypto.randomUUID(),
+      paymentIntentId,
+      amount: currentIntent.amount,
+      asset: currentIntent.asset,
+      fromAddress: txDetails.source_account,
+      toAddress: currentIntent.recipient,
       transactionHash,
-      updatedAt: new Date()
-    })
-    .where(eq(paymentIntents.id, paymentIntentId));
+    });
 
-  return { status: 'confirmed', intent };
+    const [confirmedIntent] = await tx.update(paymentIntents)
+      .set({ status: 'CONFIRMED', updatedAt: new Date() })
+      .where(and(
+        eq(paymentIntents.id, paymentIntentId),
+        eq(paymentIntents.status, 'PENDING'),
+        eq(paymentIntents.transactionHash, transactionHash)
+      ))
+      .returning();
+
+    if (!confirmedIntent) {
+      throw new Error('Payment intent changed while confirming transaction');
+    }
+
+    return { status: 'confirmed', intent: confirmedIntent };
+  });
 }
 
 export async function checkPaymentExpiration() {
@@ -85,7 +114,11 @@ export async function checkPaymentExpiration() {
         status: 'EXPIRED',
         updatedAt: new Date()
       })
-      .where(eq(paymentIntents.id, intent.id));
+      .where(and(
+        eq(paymentIntents.id, intent.id),
+        eq(paymentIntents.status, 'CREATED'),
+        lt(paymentIntents.expiresAt, new Date())
+      ));
   }
 
   return { expired: expiredIntents.length };

@@ -1,27 +1,27 @@
 import { FastifyPluginAsync } from 'fastify';
+import fp from 'fastify-plugin';
 import bcrypt from 'bcryptjs';
 import { getDatabase, apiKeys, merchants } from '@payflow/database';
-import { eq } from 'drizzle-orm';
+import { and, eq } from 'drizzle-orm';
 
 const authPlugin: FastifyPluginAsync = async (fastify) => {
   // JWT authentication decorator
-  fastify.decorate('authenticate', async (request: any, reply: any) => {
-    try {
-      await request.jwtVerify();
-    } catch (err) {
-      reply.send(err);
-    }
+  fastify.decorate('authenticate', async (request: any) => {
+    await request.jwtVerify();
   });
 
   // API key authentication decorator
   fastify.decorate('apiKeyAuth', async (request: any, reply: any) => {
+    try {
+      await request.jwtVerify();
+      return;
+    } catch {
+      // Continue with API key authentication.
+    }
+
     const authHeader = request.headers.authorization;
 
     if (!authHeader || !authHeader.startsWith('Bearer ')) {
-      // If JWT auth already passed, skip API key auth
-      if (request.user) {
-        return;
-      }
       return reply.status(401).send({
         error: 'Unauthorized',
         message: 'Missing or invalid authorization header',
@@ -31,7 +31,7 @@ const authPlugin: FastifyPluginAsync = async (fastify) => {
     const apiKey = authHeader.substring(7);
 
     // Validate API key format
-    if (!apiKey || !apiKey.startsWith('pk_') || apiKey.length < 20) {
+    if (!/^pk_[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}_[a-f0-9]{64}$/i.test(apiKey)) {
       return reply.status(401).send({
         error: 'Invalid API key',
         message: 'API key format is invalid',
@@ -41,7 +41,7 @@ const authPlugin: FastifyPluginAsync = async (fastify) => {
     // Verify API key against database
     const db = getDatabase();
     
-    // Get all active API keys and check if any match
+    const keyId = apiKey.split('_')[1];
     const allApiKeys = await db
       .select({
         id: apiKeys.id,
@@ -51,7 +51,10 @@ const authPlugin: FastifyPluginAsync = async (fastify) => {
         expiresAt: apiKeys.expiresAt,
       })
       .from(apiKeys)
-      .where(eq(apiKeys.isActive, true));
+      .where(and(
+        eq(apiKeys.keyPrefix, `pk_${keyId.substring(0, 8)}`),
+        eq(apiKeys.isActive, true)
+      ));
 
     let validApiKey = null;
     for (const keyRecord of allApiKeys) {
@@ -112,4 +115,4 @@ declare module 'fastify' {
   }
 }
 
-export default authPlugin;
+export default fp(authPlugin);
